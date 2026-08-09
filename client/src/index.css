@@ -279,7 +279,7 @@
   /* Location chip — subtle pill in light mode, indigo ring + white text in dark mode */
   .chip-location {
     border: 1px solid hsl(213 35% 90%);
-    background-color: hsl(213 45% 96%);
+    background-color: transparent;
     color: hsl(215 28% 34%);
     font-weight: 500;
   }
