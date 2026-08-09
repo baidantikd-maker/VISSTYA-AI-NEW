@@ -15,8 +15,8 @@ export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 export const startLogin = () => {
   const oauthPortalUrl = import.meta.env.VITE_OAUTH_PORTAL_URL;
 
-  // No OAuth portal configured (e.g. local demo mode): the server auto-signs
-  // requests in as a demo user, so just head straight to the app.
+  // No OAuth portal configured (e.g. local guest mode): the server auto-signs
+  // requests in as a guest, so just head straight to the app.
   if (!oauthPortalUrl) {
     window.location.href = "/verify";
     return;

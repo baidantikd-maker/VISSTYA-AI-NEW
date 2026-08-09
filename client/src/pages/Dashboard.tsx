@@ -27,7 +27,7 @@ function StatCard({
   const { theme } = useTheme();
   const isDark = theme === "dark";
   return (
-    <div className={isDark ? "panel-border-only panel-border-dashed glass p-5" : "panel panel-white-border p-5"}>
+    <div className={isDark ? "panel-border-only panel-border-dashed glass p-5" : "rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-5 shadow-[0_1px_2px_rgba(16,24,40,0.06),0_8px_20px_-6px_rgba(16,24,40,0.12),0_20px_40px_-12px_rgba(16,24,40,0.14)]"}>
       <p className={isDark ? "text-sm font-bold uppercase tracking-wide text-white [text-shadow:0_0_12px_hsl(261_88%_60%_/_1),0_0_28px_hsl(261_88%_60%_/_0.7),0_0_48px_hsl(261_88%_60%_/_0.4)]" : "text-sm text-[hsl(var(--muted))]"}>{label}</p>
       <p className={`mt-2 text-3xl font-medium tabular-nums text-[hsl(var(--foreground))] ${className ?? ""}`}>
         {value}
@@ -83,7 +83,7 @@ export default function Dashboard() {
           <StatCard label="Total verifications" value={stats.total} />
           <StatCard label="Trustable" value={stats.trustable} className={isDark ? "stat-number-trustable" : "text-trustable"} />
           <StatCard label="Average" value={stats.average} className={isDark ? "stat-number-average" : "text-average"} />
-          <StatCard label="False" value={stats.false} className={isDark ? "stat-number-false" : "text-false"} />
+          <StatCard label="Low confidence" value={stats.false} className={isDark ? "stat-number-false" : "text-false"} />
         </div>
 
         {/* Recent */}
@@ -104,7 +104,7 @@ export default function Dashboard() {
             </button>
           </div>
 
-          <div className={isDark ? "panel-border-only glass mt-5 divide-y divide-[hsl(var(--border))] overflow-hidden shadow-[0_0_18px_rgba(255,255,255,0.3),0_0_50px_rgba(255,255,255,0.12)]" : "panel mt-5 divide-y divide-[hsl(var(--border))] overflow-hidden"}>
+          <div className={isDark ? "panel-border-only glass mt-5 divide-y divide-[hsl(var(--border))] overflow-hidden shadow-[0_0_18px_rgba(255,255,255,0.3),0_0_50px_rgba(255,255,255,0.12)]" : "rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] mt-5 divide-y divide-[hsl(var(--border))] overflow-hidden shadow-[0_1px_2px_rgba(16,24,40,0.06),0_8px_20px_-6px_rgba(16,24,40,0.12),0_20px_40px_-12px_rgba(16,24,40,0.14)]"}>
             {recent.map((report) => (
               <button
                 key={report.id}

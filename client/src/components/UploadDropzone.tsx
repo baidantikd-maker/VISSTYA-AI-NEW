@@ -93,18 +93,33 @@ export function UploadDropzone({
         onDragLeave={() => setDragOver(false)}
         onDrop={onDrop}
         className={cn(
-          "flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed px-6 py-12 text-center transition-all duration-300",
+          "flex cursor-pointer flex-col items-center justify-center border border-dashed px-6 py-12 text-center transition-all duration-300",
           isDark
             ? dragOver
-              ? "border-white bg-[hsl(var(--secondary))] shadow-[0_0_22px_rgba(255,255,255,0.5)]"
-              : "border-white/50 hover:border-white hover:bg-[hsl(var(--secondary))/30] shadow-[0_0_18px_rgba(255,255,255,0.3),0_0_40px_rgba(255,255,255,0.12)]"
+              ? "rounded-xl border-white bg-[hsl(var(--secondary))] shadow-[0_0_22px_rgba(255,255,255,0.5)]"
+              : "rounded-xl border-white/50 hover:border-white hover:bg-[hsl(var(--secondary))/30] shadow-[0_0_18px_rgba(255,255,255,0.3),0_0_40px_rgba(255,255,255,0.12)]"
             : dragOver
-              ? "border-[hsl(var(--primary))] bg-[hsl(var(--secondary))]"
-              : "border-[hsl(var(--input))] hover:border-[hsl(var(--foreground))]"
+              ? "rounded-2xl border-[#5967A0] bg-[#EEF0F8]"
+              : "rounded-2xl border-[#D9DBDF] bg-[#F8F8F7] hover:border-[#C9CFE8] hover:bg-[#F3F4FB]"
         )}
       >
-        <span className="flex size-11 items-center justify-center rounded-full border border-[hsl(var(--border))] bg-[hsl(var(--card))]">
-          <ImagePlus className="size-5 text-[hsl(var(--foreground))]" strokeWidth={1.5} />
+        <span
+          className={cn(
+            "flex size-11 items-center justify-center rounded-full",
+            isDark
+              ? "border border-[hsl(var(--border))] bg-[hsl(var(--card))]"
+              : "border border-[#E1E5F2] bg-[#F1F3FA]"
+          )}
+        >
+          <ImagePlus
+            className={cn(
+              "size-5",
+              isDark
+                ? "text-[hsl(var(--foreground))]"
+                : "text-[#5967A0]"
+            )}
+            strokeWidth={1.5}
+          />
         </span>
         <p className="mt-4 text-sm font-medium text-[hsl(var(--foreground))]">
           Drop media here, or <span className="underline underline-offset-4">browse</span>
@@ -142,13 +157,23 @@ export function UploadDropzone({
                 if (e.key === "Enter") applyUrl();
               }}
               placeholder="Paste a media URL…"
-              className="h-10 w-full rounded-md border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-3 text-sm outline-none focus:border-[hsl(var(--foreground))]"
+              className={cn(
+                "h-10 w-full rounded-md border px-3 text-sm outline-none transition-colors",
+                isDark
+                  ? "border-[hsl(var(--input))] bg-[hsl(var(--card))] focus:border-[hsl(var(--foreground))]"
+                  : "border-[#D9DBDF] bg-[hsl(var(--card))] focus:border-[#5967A0]"
+              )}
               autoFocus
             />
             <button
               type="button"
               onClick={applyUrl}
-              className="shrink-0 rounded-md bg-[hsl(var(--primary))] px-4 text-sm font-medium text-[hsl(var(--primary-foreground))] transition-opacity hover:opacity-90"
+              className={cn(
+                "shrink-0 rounded-md px-4 text-sm font-medium transition-opacity hover:opacity-90",
+                isDark
+                  ? "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]"
+                  : "rounded-lg bg-[#5967A0] text-white"
+              )}
             >
               Add
             </button>
@@ -158,10 +183,10 @@ export function UploadDropzone({
             type="button"
             onClick={() => setShowUrl(true)}
             className={cn(
-              "inline-flex items-center gap-2 transition-colors hover:text-[hsl(var(--foreground))]",
+              "inline-flex items-center gap-2 transition-colors",
               isDark
-                ? "text-base font-semibold text-[hsl(var(--muted))]"
-                : "text-sm text-[hsl(var(--muted))]"
+                ? "text-base font-semibold text-[hsl(var(--muted))] hover:text-[hsl(var(--foreground))]"
+                : "-mx-2.5 rounded-md px-2.5 py-1.5 text-sm text-[#6B6F76] hover:bg-[#F1F3FA] hover:text-[#202124]"
             )}
           >
             <Link2 className={isDark ? "size-5" : "size-4"} />

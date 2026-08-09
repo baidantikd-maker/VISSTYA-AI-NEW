@@ -89,7 +89,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 {initials}
               </span>
               <span className="text-sm text-[hsl(var(--muted))]">
-                {user?.name ?? "Demo User"}
+                {user?.name ?? "Guest Mode"}
               </span>
             </div>
             <button

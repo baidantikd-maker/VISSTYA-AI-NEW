@@ -1,5 +1,5 @@
 // Demo mode lets the app run locally without the Manus OAuth server or MySQL.
-// It auto-authenticates every request as a demo user and stores verification
+// It auto-authenticates every request in guest mode and stores verification
 // reports in memory. Enabled explicitly via DEMO_MODE=true, or implicitly in
 // development when the OAuth server and database are not configured.
 const autoDemoMode =

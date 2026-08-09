@@ -2,6 +2,10 @@
 
 @import "tailwindcss";
 
+/* Class-based dark mode: `dark:` variants follow the app's theme toggle
+   (the `.dark` class on <html>), not the OS color scheme */
+@custom-variant dark (&:is(.dark *));
+
 /* ============================================================================
    Visstya AI — Editorial Evidence Platform Design System
    Warm white surfaces, near-black text, muted status colors.
@@ -9,14 +13,14 @@
 
 @layer base {
   :root {
-    /* Color Palette — warm neutral editorial */
-    --background: 40 33% 98%;
+    /* Color Palette — neutral premium surfaces */
+    --background: 215 16% 96%;
     --foreground: 240 6% 10%;
     --card: 0 0% 100%;
     --card-foreground: 240 6% 10%;
     --primary: 240 6% 10%;
     --primary-foreground: 40 33% 98%;
-    --secondary: 40 20% 94%;
+    --secondary: 215 16% 93%;
     --secondary-foreground: 240 6% 12%;
     --accent: 217 72% 44%;
     --accent-foreground: 0 0% 100%;
@@ -24,8 +28,8 @@
     --muted-foreground: 240 4% 45%;
     --destructive: 0 62% 42%;
     --destructive-foreground: 0 0% 100%;
-    --border: 40 12% 89%;
-    --input: 40 12% 89%;
+    --border: 215 14% 88%;
+    --input: 215 14% 88%;
     --ring: 217 72% 44%;
     --radius: 0.5rem;
 
@@ -148,6 +152,17 @@
     line-height: 1.65;
   }
 
+  /* Light mode only — every heading and subheading renders dark black */
+  html:not(.dark) h1,
+  html:not(.dark) h2,
+  html:not(.dark) h3,
+  html:not(.dark) h4,
+  html:not(.dark) h5,
+  html:not(.dark) h6,
+  html:not(.dark) .section-label {
+    color: hsl(var(--foreground));
+  }
+
   ::selection {
     background-color: hsl(var(--accent) / 0.14);
   }
@@ -247,10 +262,12 @@
       0 0 10px hsla(8 72% 45% / 0.4);
   }
 
-  /* Location chip — plain in light mode, indigo ring + white text in dark mode */
+  /* Location chip — subtle pill in light mode, indigo ring + white text in dark mode */
   .chip-location {
-    border: 1px solid hsl(var(--border));
-    color: hsl(var(--muted));
+    border: 1px solid hsl(213 35% 90%);
+    background-color: hsl(213 45% 96%);
+    color: hsl(215 28% 34%);
+    font-weight: 500;
   }
   .dark .chip-location {
     border: 2px solid hsla(261 88% 60% / 0.8);
@@ -271,6 +288,36 @@
   }
   .dark .score-mark-suffix {
     color: hsl(var(--foreground) / 0.7);
+  }
+
+  /* Report page — secondary text and labels render dark black in light mode only */
+  html:not(.dark) .report-page {
+    --muted: 240 6% 10%;
+    --muted-foreground: 240 6% 10%;
+  }
+
+  /* Report page (light mode only) — boxes match the landing page cards */
+  html:not(.dark) .report-page .panel,
+  html:not(.dark) .report-page .panel-subtle,
+  html:not(.dark) .report-page .card-glow {
+    border: 1px solid hsl(var(--border));
+    background-color: hsl(var(--card));
+    border-radius: 0.75rem;
+    box-shadow:
+      0 1px 2px rgba(16, 24, 40, 0.06),
+      0 8px 20px -6px rgba(16, 24, 40, 0.12),
+      0 20px 40px -12px rgba(16, 24, 40, 0.14);
+  }
+
+  /* Settings page (light mode only) — boxes match the landing page cards */
+  html:not(.dark) .settings-page .panel {
+    border: 1px solid hsl(var(--border));
+    background-color: hsl(var(--card));
+    border-radius: 0.75rem;
+    box-shadow:
+      0 1px 2px rgba(16, 24, 40, 0.06),
+      0 8px 20px -6px rgba(16, 24, 40, 0.12),
+      0 20px 40px -12px rgba(16, 24, 40, 0.14);
   }
 
   /* Step numbers — plain in light mode, indigo glow in dark mode */
@@ -361,6 +408,140 @@
     border: 1px solid hsl(var(--border));
     background-color: hsl(var(--secondary) / 0.45);
     color: hsl(var(--card-foreground));
+  }
+
+  /* Bright-mode atmospheric CTA — soft ambient glows, micro-dot texture, corner blooms */
+  .cta-ambient {
+    overflow: hidden;
+  }
+
+  .cta-ambient-glow {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(60px);
+    will-change: transform;
+  }
+
+  .cta-ambient-glow-1 {
+    top: -22%;
+    left: -14%;
+    width: 62%;
+    height: 78%;
+    background: radial-gradient(
+      circle at center,
+      hsl(212 70% 88% / 0.55) 0%,
+      transparent 68%
+    );
+    animation: cta-ambient-drift-a 26s var(--ease-in-out) infinite alternate;
+  }
+
+  .cta-ambient-glow-2 {
+    top: -26%;
+    right: -12%;
+    width: 58%;
+    height: 80%;
+    background: radial-gradient(
+      circle at center,
+      hsl(262 60% 91% / 0.55) 0%,
+      transparent 68%
+    );
+    animation: cta-ambient-drift-b 31s var(--ease-in-out) infinite alternate;
+  }
+
+  .cta-ambient-glow-3 {
+    bottom: -34%;
+    left: 16%;
+    width: 72%;
+    height: 64%;
+    background: radial-gradient(
+      circle at center,
+      hsl(44 60% 90% / 0.6) 0%,
+      transparent 68%
+    );
+    animation: cta-ambient-drift-b 36s var(--ease-in-out) infinite alternate;
+  }
+
+  /* Delicate micro-dot texture, faded toward a clean center */
+  .cta-ambient-dots {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+      circle,
+      hsl(215 30% 66% / 0.22) 1px,
+      transparent 1px
+    );
+    background-size: 15px 15px;
+    -webkit-mask-image: radial-gradient(
+      ellipse 88% 92% at 50% 40%,
+      transparent 0%,
+      transparent 26%,
+      black 58%
+    );
+    mask-image: radial-gradient(
+      ellipse 88% 92% at 50% 40%,
+      transparent 0%,
+      transparent 26%,
+      black 58%
+    );
+  }
+
+  /* Extremely subtle corner light blooms */
+  .cta-ambient-bloom {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(26px);
+    will-change: transform;
+  }
+
+  .cta-ambient-bloom-tl {
+    top: -18%;
+    left: -6%;
+    width: 32%;
+    height: 58%;
+    background: radial-gradient(
+      circle at center,
+      hsl(214 70% 93% / 0.8) 0%,
+      transparent 68%
+    );
+    animation: cta-ambient-drift-a 42s var(--ease-in-out) infinite alternate;
+  }
+
+  .cta-ambient-bloom-br {
+    bottom: -20%;
+    right: -7%;
+    width: 36%;
+    height: 62%;
+    background: radial-gradient(
+      circle at center,
+      hsl(40 65% 92% / 0.8) 0%,
+      transparent 68%
+    );
+    animation: cta-ambient-drift-b 48s var(--ease-in-out) infinite alternate;
+  }
+
+  @keyframes cta-ambient-drift-a {
+    from {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+      transform: translate3d(2.5%, -2%, 0) scale(1.05);
+    }
+  }
+
+  @keyframes cta-ambient-drift-b {
+    from {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+      transform: translate3d(-2.5%, 2%, 0) scale(1.05);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cta-ambient-glow,
+    .cta-ambient-bloom {
+      animation: none;
+    }
   }
 
   .sample-badge {
@@ -475,6 +656,93 @@
     gap: 0.625rem;
     opacity: 0.8;
   }
+
+  /* Settings icon — theme-native color (near-black in light, near-white in dark) */
+  .nav-settings-icon {
+    color: hsl(var(--foreground));
+    transition: color 300ms var(--ease-out);
+  }
+
+  /* "Sample report" label — dark charcoal, semi-bold, tracked (light mode only) */
+  html:not(.dark) .sample-report-label {
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    color: hsl(240 6% 22%);
+  }
+
+  /* Sample report trust score — the score dominates the card (light mode only) */
+  html:not(.dark) .sample-score > span:first-child {
+    font-size: 3.75rem;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: hsl(229 26% 22%);
+  }
+  @media (min-width: 768px) {
+    html:not(.dark) .sample-score > span:first-child {
+      font-size: 4.75rem;
+    }
+  }
+  html:not(.dark) .sample-score > span:nth-child(2) {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: hsl(var(--muted));
+  }
+  html:not(.dark) .sample-score > span:nth-child(3) {
+    border-radius: 9999px;
+    padding: 0.25rem 0.875rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  /* Primary CTA — sophisticated indigo accent */
+  .btn-verify {
+    background-color: hsl(228 55% 42%);
+    color: #fff;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    box-shadow:
+      0 1px 2px rgba(16, 24, 40, 0.08),
+      0 8px 20px -6px rgba(42, 62, 148, 0.5);
+    transition:
+      background-color 200ms var(--ease-out),
+      box-shadow 200ms var(--ease-out),
+      transform 150ms var(--ease-out);
+  }
+  .btn-verify:hover {
+    background-color: hsl(228 58% 37%);
+    box-shadow:
+      0 1px 2px rgba(16, 24, 40, 0.1),
+      0 12px 26px -6px rgba(42, 62, 148, 0.6);
+    transform: translateY(-1px);
+  }
+
+  /* Score breakdown rows — crisp dark charcoal text (light mode only) */
+  html:not(.dark) .sample-breakdown .score-mark {
+    color: #111827;
+    font-weight: 700;
+  }
+  html:not(.dark) .sample-breakdown .score-mark-suffix {
+    color: #374151;
+  }
+  html:not(.dark) .sample-breakdown > div > div > span:first-child {
+    color: #1f2937;
+    font-weight: 600;
+  }
+}
+
+/* Bold score bar fill — dark, saturated status colors (light mode only).
+   Kept UNLAYERED on purpose: unlayered rules beat every Tailwind layer
+   (base/components/utilities) no matter the order or specificity. */
+html:not(.dark) .bar-strong-success {
+  background-color: hsl(158 72% 18%);
+}
+html:not(.dark) .bar-strong-average {
+  background-color: hsl(36 88% 26%);
+}
+html:not(.dark) .bar-strong-false {
+  background-color: hsl(8 70% 32%);
 }
 
 /* ============================================================================

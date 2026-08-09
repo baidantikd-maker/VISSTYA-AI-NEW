@@ -10,13 +10,13 @@ export type TrpcContext = {
 };
 
 /**
- * Fixed identity used in demo mode, where no OAuth server or database is
+ * Fixed identity used in guest mode, where no OAuth server or database is
  * available. Every request is authenticated as this user.
  */
-export const DEMO_USER: User = {
+export const GUEST_USER: User = {
   id: 1,
-  openId: "demo-user",
-  name: "Demo User",
+  openId: "guest-mode",
+  name: "Guest Mode",
   email: null,
   loginMethod: "demo",
   role: "user",
@@ -34,9 +34,9 @@ export async function createContext(
     user = await sdk.authenticateRequest(opts.req);
   } catch (error) {
     if (ENV.isDemoMode) {
-      // Authentication is optional for public procedures; in demo mode we
-      // sign every request in as the demo user instead.
-      user = DEMO_USER;
+      // Authentication is optional for public procedures; in guest mode we
+      // sign every request in as the guest instead.
+      user = GUEST_USER;
     } else {
       user = null;
     }

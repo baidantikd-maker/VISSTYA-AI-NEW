@@ -13,7 +13,7 @@ import { useLocation } from "wouter";
 
 const FILTERS: Array<{ key: StatusBand | "ALL"; label: string }> = [
   { key: "ALL", label: "All" },
-  { key: "FALSE", label: "False" },
+  { key: "FALSE", label: "Low confidence" },
   { key: "AVERAGE", label: "Average" },
   { key: "TRUSTABLE", label: "Trustable" },
 ];
@@ -142,7 +142,7 @@ export default function History() {
                 "divide-y divide-[hsl(var(--border))] overflow-hidden",
                 isDark
                   ? "panel-border-only glass shadow-[0_0_18px_rgba(255,255,255,0.3),0_0_50px_rgba(255,255,255,0.12)]"
-                  : "panel"
+                  : "rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] shadow-[0_1px_2px_rgba(16,24,40,0.06),0_8px_20px_-6px_rgba(16,24,40,0.12),0_20px_40px_-12px_rgba(16,24,40,0.14)]"
               )}
             >
               {reports.map((report) => {

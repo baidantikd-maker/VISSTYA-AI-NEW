@@ -43,10 +43,10 @@ function RetentionOption({
       type="button"
       onClick={onClick}
       className={
-        "w-full rounded-lg border px-4 py-3 text-left transition-colors " +
+        "w-full rounded-lg border px-4 py-3 text-left transition-all " +
         (selected
-          ? "border-[hsl(var(--foreground))] bg-[hsl(var(--secondary))]"
-          : "border-[hsl(var(--border))] hover:bg-[hsl(var(--secondary))/40]")
+          ? "border-[hsl(var(--foreground))] bg-[hsl(var(--secondary))] shadow-[0_1px_2px_rgba(16,24,40,0.06),0_8px_20px_-6px_rgba(16,24,40,0.12),0_20px_40px_-12px_rgba(16,24,40,0.14)]"
+          : "border-[hsl(var(--border))] bg-[hsl(var(--card))] shadow-[0_1px_2px_rgba(16,24,40,0.06),0_4px_10px_-4px_rgba(16,24,40,0.10)] hover:bg-[hsl(var(--secondary))/40]")
       }
     >
       <p className="text-sm font-medium text-[hsl(var(--foreground))]">{label}</p>

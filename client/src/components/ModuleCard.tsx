@@ -13,6 +13,12 @@ const TONE_CLASS = {
   neutral: "text-[hsl(var(--foreground))]",
 } as const;
 
+const BAR_STRONG_CLASS = {
+  good: "bar-strong-success",
+  warn: "bar-strong-average",
+  bad: "bar-strong-false",
+} as const;
+
 export function ModuleCard({
   index,
   title,
@@ -73,7 +79,7 @@ export function ModuleCard({
 
       {open && (
         <div className="border-t border-[hsl(var(--border))] px-5 py-5">
-          <ScoreBar label={title} score={module.score} max={module.max} className="mb-5" />
+          <ScoreBar label={title} score={module.score} max={module.max} className="mb-5" barClassName={BAR_STRONG_CLASS[bandTone]} />
           <p className="text-sm leading-relaxed text-[hsl(var(--foreground))]">
             {module.summary}
           </p>

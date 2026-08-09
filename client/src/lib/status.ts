@@ -13,7 +13,7 @@ export interface StatusMeta {
 export const STATUS_META: Record<StatusBand, StatusMeta> = {
   FALSE: {
     band: "FALSE",
-    label: "FALSE",
+    label: "LOW CONFIDENCE",
     textClass: "text-false",
     bgClass: "bg-false",
     borderClass: "border-false",

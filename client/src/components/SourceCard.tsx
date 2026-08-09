@@ -49,7 +49,7 @@ export function SourceCard({ source }: { source: Source }) {
             <ArrowUpRight className="size-3.5" />
           </span>
         ) : (
-          <span className="link-arrow">
+          <span className="link-arrow text-[hsl(var(--foreground))]">
             Open source
             <ArrowUpRight className="size-3.5" />
           </span>

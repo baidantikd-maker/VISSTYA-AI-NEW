@@ -35,7 +35,7 @@ export function ClaimForm({
             "w-full resize-none rounded-md border px-3 py-2.5 text-sm leading-relaxed outline-none transition-colors",
             isDark
               ? "border-dashed border-white/60 bg-white/10 text-white placeholder:text-[hsl(var(--muted))] focus:border-solid focus:border-white shadow-[0_0_10px_rgba(255,255,255,0.25),0_0_20px_rgba(255,255,255,0.1)] backdrop-blur-sm"
-              : "border-[hsl(var(--input))] bg-[hsl(var(--card))] placeholder:text-[hsl(var(--muted))] focus:border-[hsl(var(--foreground))]"
+              : "border-[#D9DBDF] bg-[hsl(var(--card))] placeholder:text-[hsl(var(--muted))] focus:border-[#5967A0]"
           )}
         />
         <p
@@ -70,7 +70,7 @@ export function ClaimForm({
             "h-10 w-full rounded-md border px-3 text-sm outline-none transition-colors",
             isDark
               ? "border-dashed border-white/60 bg-white/10 text-white placeholder:text-[hsl(var(--muted))] focus:border-solid focus:border-white shadow-[0_0_10px_rgba(255,255,255,0.25),0_0_20px_rgba(255,255,255,0.1)] backdrop-blur-sm"
-                : "border-[hsl(var(--input))] bg-[hsl(var(--card))] placeholder:text-[hsl(var(--muted))] focus:border-[hsl(var(--foreground))]"
+                : "border-[#D9DBDF] bg-[hsl(var(--card))] placeholder:text-[hsl(var(--muted))] focus:border-[#5967A0]"
             )}
           />
         </div>
@@ -96,7 +96,7 @@ export function ClaimForm({
                   "border-dashed border-white/60 bg-white/10 [&::-webkit-calendar-picker-indicator]:invert focus:border-solid focus:border-white shadow-[0_0_10px_rgba(255,255,255,0.25),0_0_20px_rgba(255,255,255,0.1)] backdrop-blur-sm",
                   value.date ? "text-white" : "text-[hsl(var(--muted))]"
                 )
-                : "border-[hsl(var(--input))] bg-[hsl(var(--card))] focus:border-[hsl(var(--foreground))]"
+                : "border-[#D9DBDF] bg-[hsl(var(--card))] focus:border-[#5967A0]"
             )}
           />
         </div>

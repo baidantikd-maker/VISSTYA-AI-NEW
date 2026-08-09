@@ -1,16 +1,9 @@
 import { Logo } from "./Logo";
-import { ArrowRight, Disc3, Menu, X } from "lucide-react";
+import { ArrowRight, Disc3, Menu, Settings, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { WheelMenu } from "./WheelMenu";
-
-const MENU_LINKS = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/verify", label: "Verify" },
-  { href: "/history", label: "History" },
-  { href: "/settings", label: "Settings" },
-];
 
 const ANCHOR_LINKS = [
   { href: "/#how-it-works", label: "How it works" },
@@ -57,22 +50,6 @@ export function Navbar() {
 
         {/* Desktop navigation */}
         <nav className="hidden items-center gap-1 md:flex">
-          {MENU_LINKS.map((item) => (
-            <button
-              key={item.href}
-              type="button"
-              onClick={() => go(item.href)}
-              className={cn(
-                "rounded-md px-3 py-1.5 text-sm transition-colors",
-                isActive(item.href)
-                  ? "bg-[hsl(var(--secondary))] font-medium text-[hsl(var(--foreground))]"
-                  : "text-[hsl(var(--muted))] hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]"
-              )}
-            >
-              {item.label}
-            </button>
-          ))}
-          <span className="mx-2 hidden h-4 w-px bg-[hsl(var(--border))] xl:block" />
           {ANCHOR_LINKS.map((item) => (
             <button
               key={item.href}
@@ -112,6 +89,14 @@ export function Navbar() {
           </button>
           <button
             type="button"
+            onClick={() => setLocation("/settings")}
+            className="inline-flex size-9 items-center justify-center rounded-md transition-colors hover:bg-[hsl(var(--secondary))] active:scale-[0.97]"
+            aria-label="Settings"
+          >
+            <Settings className="nav-settings-icon size-5" />
+          </button>
+          <button
+            type="button"
             onClick={() => setOpen((o) => !o)}
             className="inline-flex size-9 items-center justify-center rounded-md text-[hsl(var(--foreground))] transition-colors hover:bg-[hsl(var(--secondary))] md:hidden"
             aria-label={open ? "Close menu" : "Open menu"}
@@ -125,23 +110,6 @@ export function Navbar() {
       {open && (
         <div className="border-t border-[hsl(var(--border))] bg-[hsl(var(--background))] md:hidden">
           <div className="container flex flex-col gap-1 py-3">
-            {MENU_LINKS.map((item) => (
-              <button
-                key={item.href}
-                type="button"
-                onClick={() => go(item.href)}
-                className={cn(
-                  "flex items-center justify-between rounded-md px-3 py-2.5 text-sm transition-colors",
-                  isActive(item.href)
-                    ? "bg-[hsl(var(--secondary))] font-medium text-[hsl(var(--foreground))]"
-                    : "text-[hsl(var(--foreground))] hover:bg-[hsl(var(--secondary))]"
-                )}
-              >
-                {item.label}
-                <ArrowRight className="size-4 text-[hsl(var(--muted))]" />
-              </button>
-            ))}
-            <div className="my-1 h-px bg-[hsl(var(--border))]" />
             {ANCHOR_LINKS.map((item) => (
               <button
                 key={item.href}

@@ -81,8 +81,8 @@ export default function Verify() {
                       ? "border-transparent bg-[hsl(261_88%_60%)] text-white"
                       : "border-white text-white"
                     : step >= s
-                      ? "border-transparent bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]"
-                      : "border-[hsl(var(--border))] text-[hsl(var(--muted))]"
+                      ? "border-transparent bg-[#5967A0] text-white"
+                      : "border-[#E4E5E7] text-[#6B6F76]"
                 )}
               >
                 {s}
@@ -96,8 +96,8 @@ export default function Verify() {
                         step < s && "opacity-80"
                       )
                     : step >= s
-                      ? "font-medium text-[hsl(var(--foreground))]"
-                      : "text-[hsl(var(--muted))]"
+                      ? "font-medium text-[#202124]"
+                      : "text-[#6B6F76]"
                 )}
               >
                 {s === 1 ? "Add content" : "Claim context"}
@@ -108,7 +108,7 @@ export default function Verify() {
                     "h-px flex-1",
                     isDark
                       ? "bg-white/70 shadow-[0_0_6px_rgba(255,255,255,0.7),0_0_12px_rgba(255,255,255,0.35)]"
-                      : "bg-[hsl(var(--border))]"
+                      : "bg-[#D9DBDF]"
                   )}
                 />
               )}
@@ -126,10 +126,10 @@ export default function Verify() {
                   disabled={!canProceedToContext}
                   onClick={() => setStep(2)}
                   className={cn(
-                    "inline-flex h-11 items-center rounded-md px-6 transition-opacity hover:opacity-90 disabled:pointer-events-none disabled:opacity-40",
+                    "inline-flex h-11 items-center rounded-md px-6 transition-opacity hover:opacity-90 disabled:pointer-events-none",
                     isDark
-                      ? "justify-center bg-[hsl(261_88%_60%)] text-base font-bold text-white"
-                      : "gap-2 bg-[hsl(var(--primary))] text-sm font-medium text-[hsl(var(--primary-foreground))]"
+                      ? "justify-center bg-[hsl(261_88%_60%)] text-base font-bold text-white disabled:opacity-40"
+                      : "gap-2 rounded-lg bg-[#5967A0] text-sm font-medium text-white disabled:bg-[#E9EAEE] disabled:text-[#9AA0A8]"
                   )}
                 >
                   Continue
@@ -154,10 +154,10 @@ export default function Verify() {
                   disabled={!canAnalyze}
                   onClick={submit}
                   className={cn(
-                    "inline-flex h-11 items-center rounded-md px-6 transition-opacity hover:opacity-90 disabled:pointer-events-none disabled:opacity-40",
+                    "inline-flex h-11 items-center rounded-md px-6 transition-opacity hover:opacity-90 disabled:pointer-events-none",
                     isDark
-                      ? "justify-center bg-[hsl(261_88%_60%)] text-base font-bold text-white"
-                      : "gap-2 bg-[hsl(var(--primary))] text-sm font-medium text-[hsl(var(--primary-foreground))]"
+                      ? "justify-center bg-[hsl(261_88%_60%)] text-base font-bold text-white disabled:opacity-40"
+                      : "gap-2 rounded-lg bg-[#5967A0] text-sm font-medium text-white disabled:bg-[#E9EAEE] disabled:text-[#9AA0A8]"
                   )}
                 >
                   Analyze Evidence
