@@ -91,6 +91,20 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* Light-mode page background layer only:
+     a soft white-cloud sky — very light blue base with gentle white cloud puffs.
+     Cards, panels, glows, borders and dark mode are intentionally untouched. */
+  html:not(.dark) body {
+    background-color: hsl(213 45% 95%);
+    background-image:
+      radial-gradient(85rem 60rem at 10% -6%, hsla(0 0% 100% / 0.95), transparent 62%),
+      radial-gradient(70rem 55rem at 55% -10%, hsla(0 0% 100% / 0.9), transparent 62%),
+      radial-gradient(80rem 60rem at 100% 20%, hsla(0 0% 100% / 0.85), transparent 62%),
+      radial-gradient(70rem 55rem at 25% 60%, hsla(0 0% 100% / 0.8), transparent 62%),
+      radial-gradient(90rem 70rem at 80% 95%, hsla(210 70% 90% / 0.85), transparent 62%),
+      radial-gradient(80rem 60rem at 5% 100%, hsla(205 75% 91% / 0.85), transparent 62%);
+  }
+
   h1,
   h2,
   h3,

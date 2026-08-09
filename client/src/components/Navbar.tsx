@@ -39,28 +39,30 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b border-[hsl(var(--border))] bg-[hsl(var(--background))/85] backdrop-blur-md">
       <div className="container flex h-14 items-center justify-between">
-        <button
-          type="button"
-          onClick={() => setLocation("/")}
-          className="shrink-0"
-          aria-label="Visstya AI home"
-        >
-          <Logo />
-        </button>
+        <div className="flex items-center gap-6">
+          <button
+            type="button"
+            onClick={() => setLocation("/")}
+            className="shrink-0"
+            aria-label="Visstya AI home"
+          >
+            <Logo />
+          </button>
 
-        {/* Desktop navigation */}
-        <nav className="hidden items-center gap-1 md:flex">
-          {ANCHOR_LINKS.map((item) => (
-            <button
-              key={item.href}
-              type="button"
-              onClick={() => go(item.href)}
-              className="hidden rounded-md px-3 py-1.5 text-sm text-[hsl(var(--muted))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))] xl:block"
-            >
-              {item.label}
-            </button>
-          ))}
-        </nav>
+          {/* Desktop navigation */}
+          <nav className="hidden items-center gap-1 md:flex">
+            {ANCHOR_LINKS.map((item) => (
+              <button
+                key={item.href}
+                type="button"
+                onClick={() => go(item.href)}
+                className="hidden rounded-md px-3 py-1.5 text-sm text-[hsl(var(--muted))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))] xl:block"
+              >
+                {item.label}
+              </button>
+            ))}
+          </nav>
+        </div>
 
         <div className="flex items-center gap-2">
           <button

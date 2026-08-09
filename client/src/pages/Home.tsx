@@ -136,7 +136,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[hsl(var(--background))]">
+    <div className="relative min-h-screen overflow-x-hidden bg-transparent dark:bg-[hsl(var(--background))]">
       {theme === "dark" && (
         <div
           className="pointer-events-none fixed inset-0 z-0"
@@ -168,7 +168,7 @@ export default function Home() {
           >
             Don't ask if it's AI.
             <br />
-            <span className="text-[hsl(var(--muted))]">
+            <span className="bg-linear-to-r from-[hsl(213_85%_55%)] via-[hsl(226_70%_48%)] to-[hsl(237_65%_45%)] bg-clip-text text-transparent dark:bg-none dark:text-[hsl(var(--muted))]">
               Ask if the evidence supports it.
             </span>
           </h1>

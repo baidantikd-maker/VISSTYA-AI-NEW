@@ -14,7 +14,7 @@ export default function Share() {
   const isDark = theme === "dark";
 
   return (
-    <div className="relative min-h-screen bg-[hsl(var(--background))]">
+    <div className="relative min-h-screen bg-transparent dark:bg-[hsl(var(--background))]">
       {isDark && (
         <div
           className="pointer-events-none fixed inset-0 z-0"
