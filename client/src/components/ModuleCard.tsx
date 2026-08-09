@@ -1,5 +1,6 @@
-import type { ModuleReport } from "@/mock/types";
+import type { AnalysisItem, ModuleReport } from "@/mock/types";
 import { scoreToBand } from "@/lib/status";
+import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
 import { ChevronDown, Flag } from "lucide-react";
 import { useState } from "react";
@@ -24,7 +25,13 @@ export function ModuleCard({
   defaultOpen?: boolean;
 }) {
   const [open, setOpen] = useState(defaultOpen);
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const band = scoreToBand((module.score / module.max) * 100);
+  const bandTone =
+    band === "FALSE" ? "bad" : band === "AVERAGE" ? "warn" : "good";
+  const toneClass = (tone: AnalysisItem["tone"]) =>
+    TONE_CLASS[tone === "neutral" ? bandTone : tone];
 
   return (
     <div className="panel overflow-hidden">
@@ -41,7 +48,13 @@ export function ModuleCard({
           <span className="block text-[15px] font-medium text-[hsl(var(--foreground))]">
             {title}
           </span>
-          <span className="mt-0.5 block text-xs text-[hsl(var(--muted))]">
+          <span
+            className={cn(
+              "mt-0.5 block text-xs",
+              isDark ? "font-semibold" : "text-[hsl(var(--muted))]",
+              isDark && TONE_CLASS[bandTone]
+            )}
+          >
             {module.score} / {module.max} —{" "}
             {band === "FALSE"
               ? "weak support"
@@ -66,17 +79,29 @@ export function ModuleCard({
           </p>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            {module.items.map((item) => (
-              <div
-                key={item.label}
-                className="flex items-baseline justify-between gap-3 border-b border-[hsl(var(--border))]/60 pb-2 text-sm"
-              >
-                <span className="text-[hsl(var(--muted))]">{item.label}</span>
-                <span className={cn("text-right font-medium", TONE_CLASS[item.tone])}>
-                  {item.value}
-                </span>
-              </div>
-            ))}
+            {module.items.map((item) =>
+              isDark ? (
+                <p
+                  key={item.label}
+                  className="col-span-full border-b border-[hsl(var(--border))]/60 pb-2 text-sm leading-relaxed"
+                >
+                  <span className="text-[hsl(var(--muted))]">{item.label}: </span>
+                  <span className={cn("font-medium", toneClass(item.tone))}>
+                    {item.value}
+                  </span>
+                </p>
+              ) : (
+                <div
+                  key={item.label}
+                  className="flex items-baseline justify-between gap-3 border-b border-[hsl(var(--border))]/60 pb-2 text-sm"
+                >
+                  <span className="text-[hsl(var(--muted))]">{item.label}</span>
+                  <span className={cn("text-right font-medium", TONE_CLASS[item.tone])}>
+                    {item.value}
+                  </span>
+                </div>
+              )
+            )}
           </div>
 
           {module.redFlags && module.redFlags.length > 0 && (

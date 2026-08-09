@@ -1,4 +1,5 @@
 import { PROCESSING_STEPS } from "@/mock/engine";
+import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
 import { Check, Loader2 } from "lucide-react";
 
@@ -9,6 +10,9 @@ export function VerificationProgress({
   doneSteps: number;
   generating?: boolean;
 }) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   return (
     <div>
       <ol className="space-y-0">
@@ -20,7 +24,9 @@ export function VerificationProgress({
                 className={cn(
                   "flex size-6 shrink-0 items-center justify-center rounded-full border transition-colors",
                   state === "done" &&
-                    "border-transparent bg-[hsl(var(--foreground))] text-[hsl(var(--background))]",
+                    (isDark
+                      ? "border-transparent bg-[hsl(261_88%_60%)] text-white"
+                      : "border-transparent bg-[hsl(var(--foreground))] text-[hsl(var(--background))]"),
                   state === "active" && "border-[hsl(var(--foreground))]",
                   state === "pending" && "border-[hsl(var(--border))] text-[hsl(var(--muted))]"
                 )}

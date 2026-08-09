@@ -1,4 +1,5 @@
 import { scoreToBand } from "@/lib/status";
+import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
 
 export function ScoreBar({
@@ -14,14 +15,22 @@ export function ScoreBar({
   className?: string;
   barClassName?: string;
 }) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const pct = Math.round((score / max) * 100);
   const meta = scoreToBand((score / max) * 100);
   const barColor =
     meta === "FALSE"
-      ? "bg-false"
+      ? isDark
+        ? "scale-false"
+        : "bg-false"
       : meta === "AVERAGE"
-        ? "bg-average"
-        : "bg-trustable";
+        ? isDark
+          ? "scale-average"
+          : "bg-average"
+        : isDark
+          ? "scale-trustable"
+          : "bg-trustable";
 
   return (
     <div className={cn("w-full", className)}>

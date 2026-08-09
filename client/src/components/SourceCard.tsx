@@ -1,6 +1,7 @@
 import type { Source } from "@/mock/types";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/contexts/ThemeContext";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
 
 const LABEL_CLASS: Record<Source["label"], string> = {
@@ -10,6 +11,9 @@ const LABEL_CLASS: Record<Source["label"], string> = {
 };
 
 export function SourceCard({ source }: { source: Source }) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   return (
     <a
       href={source.url}
@@ -39,10 +43,17 @@ export function SourceCard({ source }: { source: Source }) {
         <span className="text-xs text-[hsl(var(--muted))]">
           {formatDate(source.publishedAt)} · {source.domain}
         </span>
-        <span className="link-arrow">
-          Open source
-          <ArrowUpRight className="size-3.5" />
-        </span>
+        {isDark ? (
+          <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white px-4 text-sm font-semibold text-black transition-all duration-200 hover:bg-black hover:text-white active:scale-[0.98]">
+            Open source
+            <ArrowUpRight className="size-3.5" />
+          </span>
+        ) : (
+          <span className="link-arrow">
+            Open source
+            <ArrowUpRight className="size-3.5" />
+          </span>
+        )}
       </div>
     </a>
   );

@@ -187,8 +187,9 @@ export default function History() {
                       <span className={cn("block text-[10px]", isDark ? "text-white" : "text-[hsl(var(--muted))]")}>/ 100</span>
                     </span>
                     {isDark ? (
-                      <span className="hidden shrink-0 items-center rounded-md bg-[hsl(261_88%_60%)] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:inline-flex">
+                      <span className="hidden shrink-0 items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-black transition-all duration-200 hover:bg-black hover:text-white active:scale-[0.98] sm:inline-flex">
                         Open Report
+                        <ArrowRight className="size-3" />
                       </span>
                     ) : (
                       <span className="link-arrow hidden sm:inline-flex">

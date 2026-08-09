@@ -25,7 +25,7 @@ export function ReportHeader({
       <p className="section-label dark:font-extrabold dark:text-[hsl(261_88%_60%)]">
         Trust Report
       </p>
-      <h1 className="mt-3 max-w-3xl text-balance text-2xl leading-tight text-[hsl(var(--foreground))] dark:text-white md:text-[2rem] dark:[text-shadow:0_0_1px_hsl(261_88%_60%/0.6),0_0_12px_hsl(261_88%_60%/0.45),0_0_28px_hsl(261_88%_60%/0.25)]">
+      <h1 className="mt-3 max-w-3xl text-balance text-2xl leading-tight text-[hsl(var(--foreground))] md:text-[2rem] dark:text-white dark:[text-shadow:0_0_2px_hsl(270_90%_65%/0.6),0_0_10px_hsl(270_90%_65%/0.35),0_0_20px_hsl(270_90%_65%/0.15)]">
         {report.claim.event}
       </h1>
       <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-[hsl(var(--muted))]">

@@ -16,6 +16,7 @@ import { ModuleCard } from "./ModuleCard";
 import { ReportHeader } from "./ReportHeader";
 import { SourceCard } from "./SourceCard";
 import { TrustScale, TrustScore } from "./TrustScore";
+import { scoreToBand } from "@/lib/status";
 import { WarningBanner } from "./WarningBanner";
 
 const MODULES: Array<{ key: "metadata" | "vision" | "weather" | "evidence"; title: string }> = [
@@ -62,6 +63,14 @@ export function TrustReportView({
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
+  const band = scoreToBand(report.totalScore);
+  const glowVar =
+    band === "FALSE"
+      ? "8 88% 60%"
+      : band === "AVERAGE"
+        ? "48 95% 62%"
+        : "158 78% 58%";
+
   const outlineGlowButton =
     "inline-flex h-11 items-center gap-2 rounded-md px-6 transition-all duration-200 hover:bg-[hsl(var(--secondary))] active:scale-[0.98] " +
     (isDark
@@ -101,7 +110,17 @@ export function TrustReportView({
         <div className="flex flex-col gap-5">
           <div>
             <p className="section-label mb-3 dark:font-extrabold dark:text-[hsl(261_88%_60%)]">Claim</p>
-            <div className="panel-subtle space-y-4 p-4 dark:border-dotted dark:border-white/60 dark:bg-transparent dark:shadow-[0_0_10px_rgba(255,255,255,0.25),0_0_20px_rgba(255,255,255,0.1)]">
+            <div
+              className="panel-subtle space-y-4 p-4 dark:border-dotted dark:border-white/60 dark:bg-transparent dark:shadow-none"
+              style={
+                isDark
+                  ? {
+                      boxShadow:
+                        "0 0 12px rgba(255,255,255,0.3), 0 0 30px rgba(255,255,255,0.14), inset 0 0 8px rgba(255,255,255,0.08)",
+                    }
+                  : undefined
+              }
+            >
               <MetaRow icon={<Newspaper className="size-4" />} label="Claim made" value={report.claim.event} />
               {report.claim.location && (
                 <MetaRow icon={<MapPin className="size-4" />} label="Location" value={report.claim.location} />
@@ -113,7 +132,16 @@ export function TrustReportView({
           </div>
           <div>
             <p className="section-label mb-3 dark:font-extrabold dark:text-[hsl(261_88%_60%)]">Trust score</p>
-            <div className="panel p-5 dark:border dark:border-white/60 dark:bg-transparent dark:shadow-[0_0_6px_rgba(255,255,255,0.18),0_0_14px_rgba(255,255,255,0.08)]">
+            <div
+              className="panel p-5 dark:border dark:border-white/60 dark:bg-transparent dark:shadow-none"
+              style={
+                isDark
+                  ? {
+                      boxShadow: `0 0 16px hsl(${glowVar} / 0.45), 0 0 40px hsl(${glowVar} / 0.22), inset 0 0 12px hsl(${glowVar} / 0.14)`,
+                    }
+                  : undefined
+              }
+            >
               <TrustScore score={report.totalScore} />
               <TrustScale score={report.totalScore} className="mt-6" />
             </div>
@@ -139,7 +167,7 @@ export function TrustReportView({
         <div className="mb-4 flex items-end justify-between">
           <div>
             <p className="section-label dark:font-extrabold dark:text-[hsl(261_88%_60%)]">Analysis</p>
-            <h2 className="mt-2 text-xl dark:text-white md:text-2xl dark:[text-shadow:0_0_1px_hsl(261_88%_60%/0.6),0_0_12px_hsl(261_88%_60%/0.45),0_0_28px_hsl(261_88%_60%/0.25)]">How each evidence signal scored</h2>
+            <h2 className="mt-2 text-xl text-[hsl(var(--foreground))] md:text-2xl dark:text-white dark:[text-shadow:0_0_2px_hsl(270_90%_65%/0.6),0_0_10px_hsl(270_90%_65%/0.35),0_0_20px_hsl(270_90%_65%/0.15)]">How each evidence signal scored</h2>
           </div>
           <p className="hidden text-sm text-[hsl(var(--muted))] sm:block">
             Metadata /15 · Vision /25 · Weather /25 · Evidence /35
@@ -163,7 +191,7 @@ export function TrustReportView({
         <div className="mb-4 flex items-end justify-between">
           <div>
             <p className="section-label dark:font-extrabold dark:text-[hsl(261_88%_60%)]">Evidence</p>
-            <h2 className="mt-2 text-xl dark:text-white md:text-2xl dark:[text-shadow:0_0_1px_hsl(261_88%_60%/0.6),0_0_12px_hsl(261_88%_60%/0.45),0_0_28px_hsl(261_88%_60%/0.25)]">
+            <h2 className="mt-2 text-xl text-[hsl(var(--foreground))] md:text-2xl dark:text-white dark:[text-shadow:0_0_2px_hsl(270_90%_65%/0.6),0_0_10px_hsl(270_90%_65%/0.35),0_0_20px_hsl(270_90%_65%/0.15)]">
               Sources examined ({report.sources.length})
             </h2>
           </div>
@@ -181,7 +209,7 @@ export function TrustReportView({
       {/* Timeline */}
       <div className="border-t border-[hsl(var(--border))] py-8">
         <p className="section-label dark:font-extrabold dark:text-[hsl(261_88%_60%)]">Sequence</p>
-        <h2 className="mt-2 text-xl dark:text-white md:text-2xl dark:[text-shadow:0_0_1px_hsl(261_88%_60%/0.6),0_0_12px_hsl(261_88%_60%/0.45),0_0_28px_hsl(261_88%_60%/0.25)]">Evidence timeline</h2>
+        <h2 className="mt-2 text-xl text-[hsl(var(--foreground))] md:text-2xl dark:text-white dark:[text-shadow:0_0_2px_hsl(270_90%_65%/0.6),0_0_10px_hsl(270_90%_65%/0.35),0_0_20px_hsl(270_90%_65%/0.15)]">Evidence timeline</h2>
         <div className="mt-6 max-w-2xl">
           <EvidenceTimeline events={report.timeline} />
         </div>
@@ -190,7 +218,7 @@ export function TrustReportView({
       {/* Limitations */}
       <div className="border-t border-[hsl(var(--border))] py-8">
         <p className="section-label dark:font-extrabold dark:text-[hsl(261_88%_60%)]">Caveats</p>
-        <h2 className="mt-2 text-xl dark:text-white md:text-2xl dark:[text-shadow:0_0_1px_hsl(261_88%_60%/0.6),0_0_12px_hsl(261_88%_60%/0.45),0_0_28px_hsl(261_88%_60%/0.25)]">Important limitations</h2>
+        <h2 className="mt-2 text-xl text-[hsl(var(--foreground))] md:text-2xl dark:text-white dark:[text-shadow:0_0_2px_hsl(270_90%_65%/0.6),0_0_10px_hsl(270_90%_65%/0.35),0_0_20px_hsl(270_90%_65%/0.15)]">Important limitations</h2>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {report.limitations.map((lim) => (
             <div key={lim.title} className="card-glow rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4 dark:border-white/60 dark:bg-transparent dark:shadow-[0_0_6px_rgba(255,255,255,0.18),0_0_14px_rgba(255,255,255,0.08)]">
