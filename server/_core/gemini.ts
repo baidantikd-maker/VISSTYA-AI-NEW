@@ -263,6 +263,14 @@ const parseAnalysis = (text: string): GeminiVisionAnalysis => {
   };
 
   const asNullableString = (value: unknown): string | null => {
+    if (Array.isArray(value)) {
+      const joined = value
+        .map(item => String(item ?? "").trim())
+        .filter(Boolean)
+        .join(", ");
+      return joined.length > 0 ? joined : null;
+    }
+
     const textValue = String(value ?? "").trim();
     if (textValue.length === 0 || textValue === "null") return null;
     if (/^(none|n\/a|not applicable|not visible|not available|unknown|unavailable|indeterminate|indeterminable)/i.test(textValue)) {

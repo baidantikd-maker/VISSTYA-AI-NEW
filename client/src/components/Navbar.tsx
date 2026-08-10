@@ -3,6 +3,7 @@ import { ArrowRight, Disc3, Menu, Settings, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { startLogin } from "@/const";
 import { WheelMenu } from "./WheelMenu";
 
 const ANCHOR_LINKS = [
@@ -76,7 +77,7 @@ export function Navbar() {
           </button>
           <button
             type="button"
-            onClick={() => setLocation("/dashboard")}
+            onClick={() => startLogin()}
             className="hidden rounded-md px-3 py-1.5 text-sm font-medium text-[hsl(var(--foreground))] transition-colors hover:bg-[hsl(262_70%_85%)] dark:hover:bg-[hsl(var(--secondary))] lg:block"
           >
             Sign in

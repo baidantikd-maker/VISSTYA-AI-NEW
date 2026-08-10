@@ -9,6 +9,7 @@ import History from "@/pages/History";
 import Dashboard from "@/pages/Dashboard";
 import Settings from "@/pages/Settings";
 import Share from "@/pages/Share";
+import Login from "@/pages/Login";
 import { AnimatePresence, motion } from "framer-motion";
 import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -28,6 +29,8 @@ function AnimatedRoutes() {
       >
         <Switch>
           <Route path={"/"} component={Home} />
+          <Route path={"/login"} component={Login} />
+          <Route path={"/auth/callback"} component={Login} />
           <Route path={"/verify"} component={Verify} />
           <Route path={"/verify/processing"} component={Processing} />
           <Route path={"/report/:id"} component={Report} />

@@ -65,7 +65,7 @@ export default function DashboardLayout({
               Sign in to continue
             </h1>
             <p className="text-sm text-[hsl(var(--muted-foreground))] text-center max-w-sm">
-              Access to this dashboard requires authentication. Continue to launch the login flow.
+              Access to this dashboard requires authentication. Sign in with your email to continue.
             </p>
           </div>
           <Button
@@ -73,7 +73,7 @@ export default function DashboardLayout({
             size="lg"
             className="w-full shadow-lg hover:shadow-xl transition-all"
           >
-            Sign in
+            Sign in with email
           </Button>
         </div>
       </div>

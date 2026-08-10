@@ -1,23 +1,50 @@
-// Demo mode lets the app run locally without the Manus OAuth server or MySQL.
-// It auto-authenticates every request in guest mode and stores verification
-// reports in memory. Enabled explicitly via DEMO_MODE=true, or implicitly in
-// development when the OAuth server and database are not configured.
-const autoDemoMode =
-  process.env.NODE_ENV !== "production" &&
-  !process.env.DATABASE_URL &&
-  !process.env.OAUTH_SERVER_URL;
+function readEnv(name: string): string {
+  return (process.env[name] ?? "").trim();
+}
+
+/** True when value is empty or still a YOUR_* / placeholder stub. */
+export function isUnsetCredential(value: string): boolean {
+  if (!value) return true;
+  const normalized = value.toLowerCase();
+  return (
+    normalized.includes("your_google_") ||
+    normalized.includes("your_supabase_") ||
+    normalized.startsWith("your-client") ||
+    normalized.startsWith("gocspx-your-") ||
+    normalized === "changeme" ||
+    normalized === "replace_me" ||
+    normalized === "xxx"
+  );
+}
 
 export const ENV = {
-  appId: process.env.VITE_APP_ID ?? "",
-  cookieSecret: process.env.JWT_SECRET ?? "",
-  databaseUrl: process.env.DATABASE_URL ?? "",
-  oAuthServerUrl: process.env.OAUTH_SERVER_URL ?? "",
-  ownerOpenId: process.env.OWNER_OPEN_ID ?? "",
+  appId: readEnv("VITE_APP_ID"),
+  cookieSecret: readEnv("JWT_SECRET"),
+  databaseUrl: readEnv("DATABASE_URL"),
+  oAuthServerUrl: readEnv("OAUTH_SERVER_URL"),
+  ownerOpenId: readEnv("OWNER_OPEN_ID"),
+  supabaseUrl: readEnv("SUPABASE_URL") || readEnv("VITE_SUPABASE_URL"),
+  supabaseAnonKey: readEnv("SUPABASE_ANON_KEY") || readEnv("VITE_SUPABASE_ANON_KEY"),
+  supabaseServiceRoleKey: readEnv("SUPABASE_SERVICE_ROLE_KEY"),
+  supabaseStorageBucket: readEnv("SUPABASE_STORAGE_BUCKET") || "media",
   isProduction: process.env.NODE_ENV === "production",
-  isDemoMode: process.env.DEMO_MODE === "true" || autoDemoMode,
-  forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
-  forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
-  geminiApiKey: process.env.GEMINI_API_KEY ?? "",
-  geminiModel: process.env.GEMINI_MODEL ?? "",
-  openWeatherApiKey: process.env.OPENWEATHER_API_KEY ?? "",
+  forgeApiUrl: readEnv("BUILT_IN_FORGE_API_URL"),
+  forgeApiKey: readEnv("BUILT_IN_FORGE_API_KEY"),
+  geminiApiKey: readEnv("GEMINI_API_KEY"),
+  geminiModel: readEnv("GEMINI_MODEL"),
+  openWeatherApiKey: readEnv("OPENWEATHER_API_KEY"),
+  newsApiKey: readEnv("NEWS_API_KEY"),
 };
+
+export function hasSupabaseConfig(): boolean {
+  return (
+    !isUnsetCredential(ENV.supabaseUrl) &&
+    !isUnsetCredential(ENV.supabaseAnonKey)
+  );
+}
+
+export function hasSupabaseAdmin(): boolean {
+  return (
+    hasSupabaseConfig() && !isUnsetCredential(ENV.supabaseServiceRoleKey)
+  );
+}

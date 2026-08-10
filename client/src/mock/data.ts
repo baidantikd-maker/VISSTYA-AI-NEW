@@ -67,7 +67,7 @@ export const SAMPLE_REPORT_84: VerificationReport = {
         "Five independent dated reports corroborate the claim. Zero sources contradict it. One wire report covers an adjacent district.",
       items: [
         { label: "Independent sources", value: "5 corroborate · 0 contradict", tone: "good" },
-        { label: "First corroboration", value: "Within 9 hours of claim", tone: "good" },
+        { label: "First corroboration", value: "Within 5 hours of media share", tone: "good" },
         { label: "Temporal consistency", value: "All reports dated 1–2 August 2026", tone: "good" },
         { label: "Out-of-scope", value: "1 report from adjacent district", tone: "warn" },
       ],
@@ -132,8 +132,8 @@ export const SAMPLE_REPORT_84: VerificationReport = {
     },
   ],
   timeline: [
-    { at: "2026-08-01T13:50:00Z", label: "Media first shared on WhatsApp", detail: "Undated image begins circulating in Jalpaiguri groups" },
     { at: "2026-08-01T11:00:00Z", label: "IMD issues Orange alert", detail: "Very heavy rainfall warning for sub-Himalayan West Bengal" },
+    { at: "2026-08-01T13:50:00Z", label: "Media first shared on WhatsApp", detail: "Undated image begins circulating in Jalpaiguri groups" },
     { at: "2026-08-01T18:45:00Z", label: "PTI publishes first report", detail: "First independent corroboration of flooding" },
     { at: "2026-08-02T06:30:00Z", label: "International outlets report", detail: "Al Jazeera and Reuters cover the floods" },
     { at: "2026-08-02T14:20:00Z", label: "Report generated", detail: "Trust engine completes analysis of 5 sources" },
@@ -212,9 +212,9 @@ export const SEED_REPORTS: VerificationReport[] = [
       evidence: {
         score: 30,
         max: 35,
-        summary: "Seven independent sources corroborate landfall timing, location and intensity.",
+        summary: "Four independent sources corroborate landfall timing, location and intensity.",
         items: [
-          { label: "Independent sources", value: "7 corroborate · 0 contradict", tone: "good" },
+          { label: "Independent sources", value: "4 corroborate · 0 contradict", tone: "good" },
           { label: "Official confirmation", value: "NDMA and IMD bulletins", tone: "good" },
           { label: "Temporal consistency", value: "All reports dated 26–27 May 2026", tone: "good" },
         ],
@@ -267,7 +267,7 @@ export const SEED_REPORTS: VerificationReport[] = [
       { at: "2026-05-24T09:00:00Z", label: "Cyclone alert issued", detail: "IMD warns coastal districts 72 hours ahead" },
       { at: "2026-05-25T21:00:00Z", label: "Evacuations complete", detail: "1.2 lakh moved to cyclone shelters" },
       { at: "2026-05-26T09:30:00Z", label: "Landfall near Sagar Island", detail: "Sustained winds 110–120 km/h" },
-      { at: "2026-05-26T15:40:00Z", label: "First wire reports", detail: "Reuters and PTI confirm landfall" },
+      { at: "2026-05-26T15:40:00Z", label: "First wire reports", detail: "Reuters confirms landfall" },
       { at: "2026-05-27T10:00:00Z", label: "Report generated", detail: "Trust engine completes analysis of 4 sources" },
     ],
     limitations: [

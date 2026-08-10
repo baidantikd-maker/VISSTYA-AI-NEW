@@ -2,7 +2,7 @@ import { AppShell } from "@/components/AppShell";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useTheme } from "@/contexts/ThemeContext";
 import { formatDate } from "@/lib/format";
-import { mockStore } from "@/mock/store";
+import { useMockReports } from "@/mock/useMockReports";
 import { STATUS_META } from "@/lib/status";
 import { ArrowRight, Plus } from "lucide-react";
 import { useMemo } from "react";
@@ -40,7 +40,7 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const reports = useMemo(() => mockStore.list(), []);
+  const reports = useMockReports();
 
   const stats = useMemo(() => {
     return {

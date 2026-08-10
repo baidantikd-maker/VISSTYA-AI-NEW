@@ -1,0 +1,1 @@
+﻿error TS5042: Option 'project' cannot be mixed with source files on a command line.

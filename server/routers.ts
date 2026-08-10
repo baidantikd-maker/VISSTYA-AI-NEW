@@ -6,6 +6,7 @@ import { z } from "zod";
 import { runTrustEngine } from "./verification";
 import * as db from "./db";
 import { nanoid } from "nanoid";
+import { parseExifFromUrl } from "./_core/exifParser";
 
 export const appRouter = router({
   system: systemRouter,
@@ -14,6 +15,10 @@ export const appRouter = router({
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      ctx.res.clearCookie(`${COOKIE_NAME}_refresh`, {
+        ...cookieOptions,
+        maxAge: -1,
+      });
       return {
         success: true,
       } as const;
@@ -134,6 +139,12 @@ export const appRouter = router({
           throw new Error("Report not found or unauthorized");
         }
         return await db.updateVerificationReport(input.id, { isPublic: "false" });
+      }),
+
+    parseExif: protectedProcedure
+      .input(z.object({ mediaUrl: z.string().url() }))
+      .query(async ({ input }) => {
+        return await parseExifFromUrl(input.mediaUrl);
       }),
   }),
 });

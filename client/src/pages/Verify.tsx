@@ -3,6 +3,7 @@ import { ClaimForm } from "@/components/ClaimForm";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
+import { trpc } from "@/lib/trpc";
 import type { AnalysisInput, ClaimContext, MediaInfo } from "@/mock/types";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useState } from "react";
@@ -39,6 +40,16 @@ export default function Verify() {
 
   const canProceedToContext = Boolean(media);
   const canAnalyze = canProceedToContext && claim.event.trim().length > 2;
+
+  const remoteImageUrl = media?.kind === "image" && /^https?:\/\//i.test(media.url) ? media.url : undefined;
+  const exifQuery = trpc.verification.parseExif.useQuery(
+    { mediaUrl: remoteImageUrl ?? "" },
+    {
+      enabled: Boolean(remoteImageUrl),
+      staleTime: 1000 * 60 * 5,
+      refetchOnWindowFocus: false,
+    }
+  );
 
   const submit = () => {
     if (!media || !canAnalyze) return;
@@ -120,6 +131,39 @@ export default function Verify() {
           {step === 1 ? (
             <div className="scale-in">
               <UploadDropzone value={media} onChange={setMedia} />
+              <div className="mt-6 rounded-3xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-5 text-sm text-[hsl(var(--foreground))] dark:border-white/40 dark:bg-[rgba(255,255,255,0.04)]">
+                <p className="section-label mb-3">EXIF metadata preview</p>
+                {!media ? (
+                  <p className="text-[hsl(var(--muted))]">Add an image URL to inspect EXIF metadata.</p>
+                ) : media.kind !== "image" ? (
+                  <p className="text-[hsl(var(--muted))]">EXIF preview is only available for images.</p>
+                ) : !remoteImageUrl ? (
+                  <p className="text-[hsl(var(--muted))]">EXIF preview requires a public image URL, not a local file.</p>
+                ) : exifQuery.isLoading ? (
+                  <p className="text-[hsl(var(--muted))]">Reading EXIF metadata from the image...</p>
+                ) : exifQuery.isError ? (
+                  <p className="text-[hsl(var(--muted))]">Unable to parse EXIF metadata for this image.</p>
+                ) : exifQuery.data ? (
+                  <div className="space-y-3">
+                    <p className="text-xs uppercase tracking-[0.2em] text-[hsl(var(--muted))]">Source</p>
+                    <p className="truncate text-sm text-[hsl(var(--foreground))]">{exifQuery.data.source}</p>
+                    {Object.keys(exifQuery.data.tags).length > 0 ? (
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {Object.entries(exifQuery.data.tags).slice(0, 10).map(([key, value]) => (
+                          <div key={key} className="rounded-2xl bg-[hsl(var(--border))/10] p-3 dark:bg-white/5">
+                            <p className="text-[11px] uppercase tracking-[0.24em] text-[hsl(var(--muted))]">{key}</p>
+                            <p className="mt-1 text-sm font-medium text-[hsl(var(--foreground))] truncate">{value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-[hsl(var(--muted))]">No EXIF tags were detected on this image.</p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-[hsl(var(--muted))]">EXIF data will appear here when a public image URL is selected.</p>
+                )}
+              </div>
               <div className="mt-8 flex justify-end">
                 <button
                   type="button"

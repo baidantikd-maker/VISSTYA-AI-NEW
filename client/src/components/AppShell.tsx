@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LayoutDashboard, History, Settings, ShieldCheck } from "lucide-react";
 import type { ReactNode } from "react";
@@ -16,7 +17,9 @@ const NAV_ITEMS = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [location, setLocation] = useLocation();
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth({
+    redirectOnUnauthenticated: true,
+  });
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
@@ -31,6 +34,39 @@ export function AppShell({ children }: { children: ReactNode }) {
     href === "/verify"
       ? location.startsWith("/verify")
       : location.startsWith(href);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-sm text-[hsl(var(--muted))]">Loading…</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center px-4">
+        <div className="panel flex w-full max-w-sm flex-col items-center gap-6 p-8 text-center">
+          <div className="flex flex-col items-center gap-3">
+            <Logo />
+            <h1 className="text-xl font-semibold tracking-tight">
+              Sign in to continue
+            </h1>
+            <p className="text-sm text-[hsl(var(--muted))]">
+              Sign in to continue using Visstya.
+            </p>
+          </div>
+          <Button
+            onClick={() => setLocation("/login")}
+            className="w-full"
+            size="lg"
+          >
+            Sign in
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen flex-col bg-transparent dark:bg-[hsl(var(--background))]">
@@ -89,7 +125,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 {initials}
               </span>
               <span className="text-sm text-[hsl(var(--muted))]">
-                {user?.name ?? "Guest Mode"}
+                {user?.name ?? "Signed in"}
               </span>
             </div>
             <button

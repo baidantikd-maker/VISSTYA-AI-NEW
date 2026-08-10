@@ -155,6 +155,9 @@ class SDKServer {
 
   private getSessionSecret() {
     const secret = ENV.cookieSecret;
+    if (!secret) {
+      throw new Error("JWT_SECRET is required for session signing.");
+    }
     return new TextEncoder().encode(secret);
   }
 
@@ -291,19 +294,20 @@ class SDKServer {
 
     // If user not in DB, sync from OAuth server automatically
     if (!user) {
+      // The session cookie is internally signed for Google login. If the
+      // corresponding user record does not yet exist, create a minimal user.
       try {
-        const userInfo = await this.getUserInfoWithJwt(sessionToken ?? "");
         await db.upsertUser({
-          openId: userInfo.openId,
-          name: userInfo.name || null,
-          email: userInfo.email ?? null,
-          loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
+          openId: session.openId,
+          name: session.name || null,
+          email: null,
+          loginMethod: "google",
           lastSignedIn: signedInAt,
         });
-        user = await db.getUserByOpenId(userInfo.openId);
+        user = await db.getUserByOpenId(session.openId);
       } catch (error) {
-        console.error("[Auth] Failed to sync user from OAuth:", error);
-        throw ForbiddenError("Failed to sync user info");
+        console.error("[Auth] Failed to create session user:", error);
+        throw ForbiddenError("Failed to synchronize authenticated user");
       }
     }
 

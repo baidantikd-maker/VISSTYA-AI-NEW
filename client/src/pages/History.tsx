@@ -5,8 +5,8 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { formatDate } from "@/lib/format";
 import { STATUS_META, scoreToBand } from "@/lib/status";
 import { cn } from "@/lib/utils";
-import { mockStore } from "@/mock/store";
 import type { StatusBand } from "@/mock/types";
+import { useMockReports } from "@/mock/useMockReports";
 import { ArrowRight, FileSearch, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useLocation } from "wouter";
@@ -26,9 +26,10 @@ export default function History() {
   const [filter, setFilter] = useState<StatusBand | "ALL">("ALL");
   const [focused, setFocused] = useState(false);
 
+  const allReports = useMockReports();
   const reports = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return mockStore.list().filter((r) => {
+    return allReports.filter((r) => {
       if (filter !== "ALL" && r.statusBand !== filter) return false;
       if (!q) return true;
       const haystack = [
@@ -40,7 +41,7 @@ export default function History() {
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [query, filter]);
+  }, [allReports, query, filter]);
 
   return (
     <AppShell>

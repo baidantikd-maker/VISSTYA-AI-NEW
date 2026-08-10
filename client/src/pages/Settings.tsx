@@ -2,6 +2,8 @@ import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { mockStore } from "@/mock/store";
+import { clearPendingInput } from "@/pages/Verify";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Moon, Sun } from "lucide-react";
@@ -176,12 +178,16 @@ export default function Settings() {
           {/* Verification history */}
           <Section
             title="Verification history"
-            description="Manage your saved verification reports."
+            description="Remove reports you created in this browser. Demo samples stay available."
           >
             <Button
               size="sm"
               variant="outline"
-              onClick={() => toast.success("History cleared")}
+              onClick={() => {
+                mockStore.clearCreated();
+                clearPendingInput();
+                toast.success("Verification history cleared");
+              }}
             >
               Clear verification history
             </Button>
@@ -190,20 +196,44 @@ export default function Settings() {
           {/* Data controls */}
           <Section
             title="Data controls"
-            description="Export or delete the data Visstya holds on you."
+            description="Export or permanently delete local Visstya data on this device."
           >
             <div className="flex flex-wrap gap-3">
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => toast.success("Data export started")}
+                onClick={() => {
+                  const blob = new Blob([mockStore.exportJson()], {
+                    type: "application/json",
+                  });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `visstya-reports-${new Date().toISOString().slice(0, 10)}.json`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                  toast.success("Data export downloaded");
+                }}
               >
                 Export my data
               </Button>
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => toast.success("Account data deletion requested")}
+                onClick={() => {
+                  const confirmed = window.confirm(
+                    "Delete all local Visstya data on this device? This removes your reports and hides demo samples."
+                  );
+                  if (!confirmed) return;
+                  mockStore.clearAll();
+                  clearPendingInput();
+                  setName("");
+                  setEmail("");
+                  setPublicProfile(true);
+                  setShareReports(true);
+                  setRetention("none");
+                  toast.success("All local data deleted");
+                }}
               >
                 Delete my data
               </Button>

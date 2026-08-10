@@ -3,6 +3,7 @@ import express from "express";
 import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
+import { isUnsetCredential } from "./env";
 import { registerOAuthRoutes } from "./oauth";
 import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
@@ -28,7 +29,36 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
   throw new Error(`No available port found starting from ${startPort}`);
 }
 
+function validateRequiredEnv() {
+  const missing: string[] = [];
+  if (isUnsetCredential(process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL ?? "")) {
+    missing.push("SUPABASE_URL");
+  }
+  if (
+    isUnsetCredential(
+      process.env.SUPABASE_ANON_KEY ?? process.env.VITE_SUPABASE_ANON_KEY ?? ""
+    )
+  ) {
+    missing.push("SUPABASE_ANON_KEY");
+  }
+  if (isUnsetCredential(process.env.SUPABASE_SERVICE_ROLE_KEY ?? "")) {
+    missing.push("SUPABASE_SERVICE_ROLE_KEY");
+  }
+  if (!(process.env.DATABASE_URL ?? "").trim()) {
+    missing.push("DATABASE_URL");
+  }
+
+  if (missing.length > 0) {
+    console.warn(
+      `[Env] Incomplete Supabase config: ${missing.join(", ")}. ` +
+        `Copy values from Supabase → Project Settings → API / Database. ` +
+        `Also run supabase/schema.sql and enable Email Auth.`
+    );
+  }
+}
+
 async function startServer() {
+  validateRequiredEnv();
   const app = express();
   const server = createServer(app);
   // Middleware to handle malformed URIs safely
