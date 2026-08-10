@@ -56,7 +56,7 @@ export function Navbar() {
                 key={item.href}
                 type="button"
                 onClick={() => go(item.href)}
-                className="hidden rounded-md px-3 py-1.5 text-sm text-[hsl(var(--muted))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))] xl:block"
+                className="hidden rounded-md px-3 py-1.5 text-sm text-[hsl(var(--muted))] transition-colors hover:bg-[hsl(262_70%_85%)] hover:text-[hsl(var(--foreground))] dark:hover:bg-[hsl(var(--secondary))] xl:block"
               >
                 {item.label}
               </button>
@@ -68,7 +68,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => setWheelOpen(true)}
-            className="hidden items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-[hsl(var(--muted))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))] md:inline-flex"
+            className="hidden items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-[hsl(var(--muted))] transition-colors hover:bg-[hsl(262_70%_85%)] hover:text-[hsl(var(--foreground))] dark:hover:bg-[hsl(var(--secondary))] md:inline-flex"
             aria-label="Open navigation wheel"
           >
             <Disc3 className="size-4" />
@@ -77,7 +77,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => setLocation("/dashboard")}
-            className="hidden rounded-md px-3 py-1.5 text-sm font-medium text-[hsl(var(--foreground))] transition-colors hover:bg-[hsl(var(--secondary))] lg:block"
+            className="hidden rounded-md px-3 py-1.5 text-sm font-medium text-[hsl(var(--foreground))] transition-colors hover:bg-[hsl(262_70%_85%)] dark:hover:bg-[hsl(var(--secondary))] lg:block"
           >
             Sign in
           </button>
@@ -92,7 +92,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => setLocation("/settings")}
-            className="inline-flex size-9 items-center justify-center rounded-md transition-colors hover:bg-[hsl(var(--secondary))] active:scale-[0.97]"
+            className="inline-flex size-9 items-center justify-center rounded-md transition-colors hover:bg-[hsl(262_70%_85%)] dark:hover:bg-[hsl(var(--secondary))] active:scale-[0.97]"
             aria-label="Settings"
           >
             <Settings className="nav-settings-icon size-5" />
@@ -100,7 +100,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
-            className="inline-flex size-9 items-center justify-center rounded-md text-[hsl(var(--foreground))] transition-colors hover:bg-[hsl(var(--secondary))] md:hidden"
+            className="inline-flex size-9 items-center justify-center rounded-md text-[hsl(var(--foreground))] transition-colors hover:bg-[hsl(262_70%_85%)] dark:hover:bg-[hsl(var(--secondary))] md:hidden"
             aria-label={open ? "Close menu" : "Open menu"}
           >
             {open ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -117,7 +117,7 @@ export function Navbar() {
                 key={item.href}
                 type="button"
                 onClick={() => go(item.href)}
-                className="rounded-md px-3 py-2.5 text-left text-sm text-[hsl(var(--muted))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]"
+                className="rounded-md px-3 py-2.5 text-left text-sm text-[hsl(var(--muted))] transition-colors hover:bg-[hsl(262_70%_85%)] hover:text-[hsl(var(--foreground))] dark:hover:bg-[hsl(var(--secondary))]"
               >
                 {item.label}
               </button>

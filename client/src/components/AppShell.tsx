@@ -71,8 +71,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                     className={cn(
                       "inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
                       active
-                        ? "bg-[hsl(var(--secondary))] font-medium text-[hsl(var(--foreground))]"
-                        : "text-[hsl(var(--muted))] hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]"
+                        ? "bg-[hsl(262_70%_85%)] font-medium text-[hsl(var(--foreground))] dark:bg-[hsl(var(--secondary))]"
+                        : "text-[hsl(var(--muted))] hover:bg-[hsl(262_70%_85%)] hover:text-[hsl(var(--foreground))] dark:hover:bg-[hsl(var(--secondary))]"
                     )}
                   >
                     <Icon className="size-4" />
@@ -98,7 +98,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 void logout();
                 setLocation("/");
               }}
-              className="rounded-md px-3 py-1.5 text-sm text-[hsl(var(--muted))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]"
+              className="rounded-md px-3 py-1.5 text-sm text-[hsl(var(--muted))] transition-colors hover:bg-[hsl(262_70%_85%)] hover:text-[hsl(var(--foreground))] dark:hover:bg-[hsl(var(--secondary))]"
             >
               Sign out
             </button>

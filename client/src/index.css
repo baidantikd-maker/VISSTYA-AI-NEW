@@ -14,7 +14,7 @@
 @layer base {
   :root {
     /* Color Palette — neutral premium surfaces */
-    --background: 215 16% 96%;
+    --background: 240 15% 97%;
     --foreground: 240 6% 10%;
     --card: 0 0% 100%;
     --card-foreground: 240 6% 10%;
@@ -91,18 +91,40 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Light-mode page background layer only:
-     a soft white-cloud sky — very light blue base with gentle white cloud puffs.
-     Cards, panels, glows, borders and dark mode are intentionally untouched. */
+  /* Light-mode page background — light pink blended with lavender.
+     The pink leads at the top, sweeping into a soft lavender base, with
+     gentle rose and lilac washes so both tones read clearly without glare.
+     Dark mode and all other tokens are untouched. */
   html:not(.dark) body {
-    background-color: hsl(213 45% 95%);
+    background-color: hsl(265 45% 96%);
     background-image:
-      radial-gradient(85rem 60rem at 10% -6%, hsla(0 0% 100% / 0.95), transparent 62%),
-      radial-gradient(70rem 55rem at 55% -10%, hsla(0 0% 100% / 0.9), transparent 62%),
-      radial-gradient(80rem 60rem at 100% 20%, hsla(0 0% 100% / 0.85), transparent 62%),
-      radial-gradient(70rem 55rem at 25% 60%, hsla(0 0% 100% / 0.8), transparent 62%),
-      radial-gradient(90rem 70rem at 80% 95%, hsla(210 70% 90% / 0.85), transparent 62%),
-      radial-gradient(80rem 60rem at 5% 100%, hsla(205 75% 91% / 0.85), transparent 62%);
+      linear-gradient(160deg, hsl(335 65% 95%) 0%, hsl(305 50% 94%) 38%, hsl(265 55% 94%) 100%),
+      radial-gradient(80rem 60rem at 0%   0%,   hsla(335 70% 93% / 0.85), transparent 60%),
+      radial-gradient(70rem 55rem at 100% 0%,   hsla(280 60% 93% / 0.75), transparent 60%),
+      radial-gradient(60rem 60rem at 50%  100%, hsla(260 65% 92% / 0.70), transparent 55%),
+      radial-gradient(50rem 45rem at 100% 100%, hsla(335 65% 94% / 0.65), transparent 60%);
+  }
+
+  /* Light mode only — interactive boxes/cards gain a thin dark-lavender outline
+     when hovered or focused, so cards feel tappable. Dark mode is untouched. */
+  html:not(.dark) .panel,
+  html:not(.dark) .panel-subtle,
+  html:not(.dark) .card-glow,
+  html:not(.dark) [class~="bg-[hsl(var(--card))]"]:not(input):not(textarea):not(select) {
+    transition:
+      outline-color 200ms var(--ease-out),
+      box-shadow 200ms var(--ease-out);
+  }
+  html:not(.dark) .panel:hover,
+  html:not(.dark) .panel-subtle:hover,
+  html:not(.dark) .card-glow:hover,
+  html:not(.dark) [class~="bg-[hsl(var(--card))]"]:not(input):not(textarea):not(select):hover,
+  html:not(.dark) .panel:focus-within,
+  html:not(.dark) .panel-subtle:focus-within,
+  html:not(.dark) .card-glow:focus-within,
+  html:not(.dark) [class~="bg-[hsl(var(--card))]"]:not(input):not(textarea):not(select):focus-within {
+    outline: 1px solid hsl(262 60% 42%);
+    outline-offset: -1px;
   }
 
   h1,

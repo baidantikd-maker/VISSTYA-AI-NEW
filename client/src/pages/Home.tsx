@@ -362,9 +362,9 @@ export default function Home() {
               <SpotlightBox
                 key={step.n}
                 enabled={theme === "light"}
-                className={`reveal p-6 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[hsl(var(--secondary))/30] ${
+                className={`reveal p-6 transition-all duration-300 hover:-translate-y-0.5 ${
                   theme === "dark"
-                    ? "rounded-md border border-white/25 bg-transparent backdrop-blur-md hover:border-white/60 hover:shadow-[0_0_10px_rgba(255,255,255,0.25),0_0_20px_rgba(255,255,255,0.12)]"
+                    ? "hover:bg-[hsl(var(--secondary))/30] rounded-md border border-white/25 bg-transparent backdrop-blur-md hover:border-white/60 hover:shadow-[0_0_10px_rgba(255,255,255,0.25),0_0_20px_rgba(255,255,255,0.12)]"
                     : "rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] shadow-[0_1px_2px_rgba(16,24,40,0.06),0_8px_20px_-6px_rgba(16,24,40,0.12),0_20px_40px_-12px_rgba(16,24,40,0.14)]"
                 }`}
                 style={{ animationDelay: `${i * 0.08}s` }}
@@ -430,9 +430,9 @@ export default function Home() {
             <SpotlightBox
               key={mod.n}
               enabled={theme === "light"}
-              className={`reveal flex flex-col p-6 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[hsl(var(--secondary))/30] ${
+              className={`reveal flex flex-col p-6 transition-all duration-300 hover:-translate-y-0.5 ${
                 theme === "dark"
-                  ? "rounded-md border border-white/25 bg-transparent backdrop-blur-md hover:border-white/60 hover:shadow-[0_0_10px_rgba(255,255,255,0.25),0_0_20px_rgba(255,255,255,0.12)]"
+                  ? "hover:bg-[hsl(var(--secondary))/30] rounded-md border border-white/25 bg-transparent backdrop-blur-md hover:border-white/60 hover:shadow-[0_0_10px_rgba(255,255,255,0.25),0_0_20px_rgba(255,255,255,0.12)]"
                   : "rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] shadow-[0_1px_2px_rgba(16,24,40,0.06),0_8px_20px_-6px_rgba(16,24,40,0.12),0_20px_40px_-12px_rgba(16,24,40,0.14)]"
               }`}
               style={{ animationDelay: `${i * 0.08}s` }}

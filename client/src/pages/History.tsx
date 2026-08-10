@@ -192,9 +192,9 @@ export default function History() {
                         <ArrowRight className="size-3" />
                       </span>
                     ) : (
-                      <span className="link-arrow hidden sm:inline-flex">
+                      <span className="hidden shrink-0 items-center gap-1.5 rounded-full border border-[hsl(261_88%_60%)]/40 bg-white px-3 py-1.5 text-xs font-semibold text-[hsl(261_88%_60%)] transition-all duration-200 hover:bg-[hsl(261_88%_60%)] hover:text-white active:scale-[0.98] sm:inline-flex">
                         Open Report
-                        <ArrowRight className="size-4" />
+                        <ArrowRight className="size-3" />
                       </span>
                     )}
                   </button>
