@@ -1,9 +1,38 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+let url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+let anonKey = (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  import.meta.env.VITE_SUPABASE_ANON_KEY) as string | undefined;
 
 let client: SupabaseClient | null = null;
+let configLoad: Promise<void> | null = null;
+
+export async function loadBrowserSupabaseConfig(): Promise<void> {
+  if (hasBrowserSupabaseConfig()) return;
+  if (configLoad) return configLoad;
+
+  configLoad = (async () => {
+    const response = await fetch("/api/config/supabase", {
+      credentials: "same-origin",
+    });
+    const config = await response.json().catch(() => ({}));
+    if (!response.ok || !config.url || !config.anonKey) {
+      throw new Error(
+        config.error ||
+          "Supabase is not configured for this deployment. Set the server Supabase environment variables in Vercel."
+      );
+    }
+    url = config.url;
+    anonKey = config.anonKey;
+  })();
+
+  try {
+    await configLoad;
+  } catch (error) {
+    configLoad = null;
+    throw error;
+  }
+}
 
 /** Keep the server's httpOnly session cookie aligned with Supabase Auth. */
 export async function syncServerSession(
@@ -38,8 +67,8 @@ export async function clearServerSession(): Promise<void> {
  * This covers a page reload and token refreshes, avoiding an expired backend
  * session while the browser still has a valid Supabase session.
  */
-export function startSupabaseSessionSync(): () => void {
-  if (!hasBrowserSupabaseConfig()) return () => undefined;
+export async function startSupabaseSessionSync(): Promise<() => void> {
+  await loadBrowserSupabaseConfig();
 
   const { data } = getBrowserSupabase().auth.onAuthStateChange(
     (event, session) => {
@@ -66,7 +95,7 @@ export function startSupabaseSessionSync(): () => void {
 export function getBrowserSupabase(): SupabaseClient {
   if (!url || !anonKey) {
     throw new Error(
-      "Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY. Add them to .env and restart the dev server."
+      "Supabase is not configured. Set the server Supabase environment variables."
     );
   }
   if (!client) {

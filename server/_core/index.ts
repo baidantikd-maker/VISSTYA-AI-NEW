@@ -3,7 +3,7 @@ import express, { type Express } from "express";
 import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { isUnsetCredential } from "./env";
+import { ENV, hasSupabaseConfig, isUnsetCredential } from "./env";
 import { registerOAuthRoutes } from "./oauth";
 import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
@@ -108,6 +108,21 @@ export async function createApp() {
   if (isDev) {
     registerDevCors(app);
   }
+  // The Supabase project URL and publishable/anon key are intentionally safe
+  // for a browser. Serving them at runtime avoids coupling Vercel's build-time
+  // VITE_* values to authentication configuration. Secret/service-role keys
+  // are never returned from this endpoint.
+  app.get("/api/config/supabase", (_req, res) => {
+    if (!hasSupabaseConfig()) {
+      res.status(503).json({
+        error:
+          "Supabase is not configured on the server. Set SUPABASE_URL and SUPABASE_ANON_KEY (or SUPABASE_PUBLISHABLE_KEY) in Vercel.",
+      });
+      return;
+    }
+    res.set("Cache-Control", "public, max-age=300, s-maxage=300");
+    res.json({ url: ENV.supabaseUrl, anonKey: ENV.supabaseAnonKey });
+  });
   registerStorageProxy(app);
   registerOAuthRoutes(app);
   // tRPC API

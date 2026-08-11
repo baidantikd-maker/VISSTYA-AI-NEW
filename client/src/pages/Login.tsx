@@ -5,6 +5,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import {
   getBrowserSupabase,
   hasBrowserSupabaseConfig,
+  loadBrowserSupabaseConfig,
   syncServerSession,
 } from "@/lib/supabase";
 import { useState } from "react";
@@ -29,11 +30,8 @@ export default function Login() {
     setBusy(true);
 
     try {
-      if (!hasBrowserSupabaseConfig()) {
-        throw new Error(
-          "Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env"
-        );
-      }
+      await loadBrowserSupabaseConfig();
+      if (!hasBrowserSupabaseConfig()) throw new Error("Supabase is not configured");
 
       const supabase = getBrowserSupabase();
 

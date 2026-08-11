@@ -13,7 +13,9 @@ const queryClient = new QueryClient();
 
 // The subscription is intentionally app-wide: it keeps the backend's
 // httpOnly cookie current whenever Supabase refreshes the browser session.
-startSupabaseSessionSync();
+void startSupabaseSessionSync().catch(error =>
+  console.error("[Auth] Supabase session sync could not start", error)
+);
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;

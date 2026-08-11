@@ -25,8 +25,12 @@ export const ENV = {
   ownerOpenId: readEnv("OWNER_OPEN_ID"),
   supabaseUrl: readEnv("SUPABASE_URL") || readEnv("VITE_SUPABASE_URL"),
   supabaseAnonKey:
-    readEnv("SUPABASE_ANON_KEY") || readEnv("VITE_SUPABASE_ANON_KEY"),
-  supabaseServiceRoleKey: readEnv("SUPABASE_SERVICE_ROLE_KEY"),
+    readEnv("SUPABASE_PUBLISHABLE_KEY") ||
+    readEnv("SUPABASE_ANON_KEY") ||
+    readEnv("VITE_SUPABASE_PUBLISHABLE_KEY") ||
+    readEnv("VITE_SUPABASE_ANON_KEY"),
+  supabaseServiceRoleKey:
+    readEnv("SUPABASE_SECRET_KEY") || readEnv("SUPABASE_SERVICE_ROLE_KEY"),
   supabaseStorageBucket: readEnv("SUPABASE_STORAGE_BUCKET") || "media",
   // S3-compatible storage (AWS S3, Cloudflare R2, MinIO, etc.). When
   // configured it takes precedence over Supabase Storage for media uploads.
