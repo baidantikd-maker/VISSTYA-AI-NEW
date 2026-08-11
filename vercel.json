@@ -12,7 +12,7 @@
   },
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/", "destination": "/api/index.mjs" },
-    { "source": "/:path*", "destination": "/api/index.mjs" }
+    { "source": "/", "destination": "/api" },
+    { "source": "/:path*", "destination": "/api" }
   ]
 }
