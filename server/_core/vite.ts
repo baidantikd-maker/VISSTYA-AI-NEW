@@ -48,20 +48,48 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath =
-    process.env.NODE_ENV === "development"
-      ? path.resolve(import.meta.dirname, "../..", "dist", "public")
-      : path.resolve(import.meta.dirname, "public");
-  if (!fs.existsSync(distPath)) {
-    console.error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`
-    );
+  const candidates = [
+    path.resolve(import.meta.dirname, "public"),
+    path.resolve(import.meta.dirname, "..", "public"),
+    path.resolve(import.meta.dirname, "../..", "dist", "public"),
+    path.resolve(process.cwd(), "dist", "public"),
+    path.resolve(process.cwd(), "public"),
+  ];
+  const distPath = candidates.find((p) => {
+    try {
+      return fs.existsSync(p) && fs.statSync(p).isDirectory();
+    } catch {
+      return false;
+    }
+  });
+
+  if (!distPath) {
+    const msg =
+      `[serveStatic] Could not find the client build directory. ` +
+      `Searched: ${candidates.join(", ")}. Make sure you ran the build step (vite build) ` +
+      `so dist/public/index.html exists.`;
+    console.error(msg);
+    app.use("*", (_req, res) => {
+      res
+        .status(500)
+        .type("html")
+        .send(
+          `<h1>Build not found</h1><pre>${msg.replace(/</g, "&lt;")}</pre>`
+        );
+    });
+    return;
   }
 
+  console.log(`[serveStatic] Serving client from: ${distPath}`);
   app.use(express.static(distPath));
 
-  // fall through to index.html if the file doesn't exist
+  // fall through to index.html if the file doesn't exist (SPA routing)
   app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+    const indexHtml = path.resolve(distPath, "index.html");
+    if (!fs.existsSync(indexHtml)) {
+      res.status(500).send(`index.html not found at ${indexHtml}`);
+      return;
+    }
+    res.sendFile(indexHtml);
   });
 }

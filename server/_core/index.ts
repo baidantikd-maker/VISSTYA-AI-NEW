@@ -57,7 +57,7 @@ function validateRequiredEnv() {
   }
 }
 
-async function startServer() {
+export async function createApp() {
   validateRequiredEnv();
   const app = express();
   const server = createServer(app);
@@ -83,13 +83,21 @@ async function startServer() {
       createContext,
     })
   );
-  // development mode uses Vite, production mode uses static files
-  if (process.env.NODE_ENV === "development") {
+  // development mode uses Vite dev server middleware, all other
+  // environments (production / staging / Vercel serverless default) serve
+  // the pre-built client bundle from dist/public.
+  const isDev = (process.env.NODE_ENV ?? "").toLowerCase() === "development";
+  if (isDev) {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
 
+  return { app, server };
+}
+
+async function startServer() {
+  const { app: _app, server } = await createApp();
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
 
@@ -102,4 +110,13 @@ async function startServer() {
   });
 }
 
-startServer().catch(console.error);
+const isEntry =
+  typeof process.argv[1] === "string" &&
+  (process.argv[1] === import.meta.url?.slice(7) ||
+    process.argv[1] === import.meta.filename ||
+    process.argv[1].endsWith("/dist/index.js") ||
+    process.argv[1].endsWith("\\dist\\index.js"));
+
+if (isEntry) {
+  startServer().catch(console.error);
+}
