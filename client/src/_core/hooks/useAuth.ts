@@ -1,6 +1,7 @@
 import { startLogin } from "@/const";
-import { authStore, type AuthUser } from "@/lib/auth";
-import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { trpc } from "@/lib/trpc";
+import { TRPCClientError } from "@trpc/client";
+import { useCallback, useEffect, useMemo } from "react";
 
 type UseAuthOptions = {
   redirectOnUnauthenticated?: boolean;
@@ -9,20 +10,65 @@ type UseAuthOptions = {
 
 export function useAuth(options?: UseAuthOptions) {
   const { redirectOnUnauthenticated = false, redirectPath } = options ?? {};
+  const utils = trpc.useUtils();
 
-  const user = useSyncExternalStore(
-    authStore.subscribe,
-    authStore.getUser,
-    authStore.getUser
-  );
+  const meQuery = trpc.auth.me.useQuery(undefined, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const logoutMutation = trpc.auth.logout.useMutation({
+    onSuccess: () => {
+      utils.auth.me.setData(undefined, null);
+    },
+  });
 
   const logout = useCallback(async () => {
-    authStore.signOut();
-  }, []);
+    try {
+      await logoutMutation.mutateAsync();
+    } catch (error: unknown) {
+      if (
+        error instanceof TRPCClientError &&
+        error.data?.code === "UNAUTHORIZED"
+      ) {
+        return;
+      }
+      throw error;
+    } finally {
+      try {
+        const { getBrowserSupabase, hasBrowserSupabaseConfig } =
+          await import("@/lib/supabase");
+        if (hasBrowserSupabaseConfig()) {
+          await getBrowserSupabase().auth.signOut();
+        }
+      } catch {
+        // ignore supabase sign-out failures
+      }
+      utils.auth.me.setData(undefined, null);
+      await utils.auth.me.invalidate();
+    }
+  }, [logoutMutation, utils]);
+
+  const state = useMemo(() => {
+    return {
+      user: meQuery.data ?? null,
+      loading: meQuery.isLoading || logoutMutation.isPending,
+      error: meQuery.error ?? logoutMutation.error ?? null,
+      isAuthenticated: Boolean(meQuery.data),
+      isGuest: !Boolean(meQuery.data),
+    };
+  }, [
+    meQuery.data,
+    meQuery.error,
+    meQuery.isLoading,
+    logoutMutation.error,
+    logoutMutation.isPending,
+  ]);
 
   useEffect(() => {
     if (!redirectOnUnauthenticated) return;
-    if (user) return;
+    if (meQuery.isLoading || logoutMutation.isPending) return;
+    if (state.user) return;
     if (typeof window === "undefined") return;
     if (redirectPath && window.location.pathname === redirectPath) return;
 
@@ -31,17 +77,17 @@ export function useAuth(options?: UseAuthOptions) {
     } else {
       startLogin();
     }
-  }, [redirectOnUnauthenticated, redirectPath, user]);
+  }, [
+    redirectOnUnauthenticated,
+    redirectPath,
+    logoutMutation.isPending,
+    meQuery.isLoading,
+    state.user,
+  ]);
 
   return {
-    user,
-    loading: false,
-    error: null,
-    isAuthenticated: Boolean(user && !user.isGuest),
-    isGuest: Boolean(user?.isGuest),
-    refresh: async () => authStore.getUser(),
+    ...state,
+    refresh: () => meQuery.refetch(),
     logout,
   };
 }
-
-export type { AuthUser };

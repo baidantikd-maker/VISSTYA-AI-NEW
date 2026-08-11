@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+dev.err.log
+dev.out.log
+
+# OS / editor
+.DS_Store
+*.swp
+
+# TypeScript
+*.tsbuildinfo

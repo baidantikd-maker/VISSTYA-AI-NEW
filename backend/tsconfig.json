@@ -1,0 +1,19 @@
+{
+  "include": ["server/**/*", "shared/**/*", "drizzle/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "test_pipeline.ts"],
+  "compilerOptions": {
+    "noEmit": true,
+    "module": "ESNext",
+    "strict": true,
+    "lib": ["esnext"],
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "baseUrl": ".",
+    "types": ["node"],
+    "paths": {
+      "@shared/*": ["./shared/*"]
+    }
+  }
+}

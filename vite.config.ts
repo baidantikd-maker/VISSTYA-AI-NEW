@@ -10,6 +10,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
+      "@shared": path.resolve(import.meta.dirname, "shared"),
     },
   },
   envDir: path.resolve(import.meta.dirname),
@@ -23,5 +24,19 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+    proxy: {
+      "/api": {
+        target: process.env.VITE_API_TARGET || "http://localhost:3000",
+        changeOrigin: true,
+      },
+      "/storage": {
+        target: process.env.VITE_API_TARGET || "http://localhost:3000",
+        changeOrigin: true,
+      },
+      "/manus-storage": {
+        target: process.env.VITE_API_TARGET || "http://localhost:3000",
+        changeOrigin: true,
+      },
+    },
   },
 });

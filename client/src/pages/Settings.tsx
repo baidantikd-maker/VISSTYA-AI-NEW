@@ -1,6 +1,5 @@
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { authStore } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { mockStore } from "@/mock/store";
@@ -154,11 +153,11 @@ export default function Settings() {
               <Button
                 size="sm"
                 onClick={() => {
-                  authStore.updateProfile({ name, email });
-                  toast.success("Profile saved");
+                  toast.info("Profile managed via Supabase Auth dashboard");
                 }}
+                disabled={isGuest}
               >
-                Save changes
+                {isGuest ? "Sign in to save profile" : "Profile read-only"}
               </Button>
             </div>
           </Section>
