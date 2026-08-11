@@ -4,11 +4,15 @@
   "buildCommand": "pnpm build",
   "installCommand": "pnpm install --frozen-lockfile=false",
   "functions": {
-    "api/index.js": {
-      "includeFiles": "dist/**"
+    "api/index.mjs": {
+      "includeFiles": "dist/**",
+      "memory": 1024,
+      "maxDuration": 60
     }
   },
+  "cleanUrls": true,
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/index.js" }
+    { "source": "/", "destination": "/api/index.mjs" },
+    { "source": "/:path*", "destination": "/api/index.mjs" }
   ]
 }
