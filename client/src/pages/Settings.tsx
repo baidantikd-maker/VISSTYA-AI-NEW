@@ -1,5 +1,6 @@
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { authStore } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { mockStore } from "@/mock/store";
@@ -58,10 +59,10 @@ function RetentionOption({
 }
 
 export default function Settings() {
-  const { logout } = useAuth();
+  const { user, isGuest, logout } = useAuth();
   const { theme, toggleTheme, switchable } = useTheme();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState(user?.name ?? "");
+  const [email, setEmail] = useState(user?.email ?? "");
   const [publicProfile, setPublicProfile] = useState(true);
   const [shareReports, setShareReports] = useState(true);
   const [retention, setRetention] = useState("none");
@@ -115,7 +116,14 @@ export default function Settings() {
           </Section>
 
           {/* Profile */}
-          <Section title="Profile" description="How you appear across Visstya.">
+          <Section
+            title="Profile"
+            description={
+              isGuest
+                ? "You're browsing as a guest. Add a name and email to keep your profile on this device."
+                : "How you appear across Visstya."
+            }
+          >
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label htmlFor="s-name" className="mb-1.5 block text-sm font-medium text-[hsl(var(--foreground))]">
@@ -145,7 +153,10 @@ export default function Settings() {
             <div className="mt-4">
               <Button
                 size="sm"
-                onClick={() => toast.success("Profile saved")}
+                onClick={() => {
+                  authStore.updateProfile({ name, email });
+                  toast.success("Profile saved");
+                }}
               >
                 Save changes
               </Button>
@@ -243,7 +254,7 @@ export default function Settings() {
           {/* Media retention */}
           <Section
             title="Media retention"
-            description="How long uploaded media is kept on our servers."
+            description="How long uploaded media is kept locally in this browser."
           >
             <div className="grid gap-3 sm:grid-cols-3">
               <RetentionOption
@@ -273,16 +284,27 @@ export default function Settings() {
           </Section>
 
           {/* Account */}
-          <Section title="Account" description="Manage your session.">
+          <Section
+            title="Account"
+            description={
+              isGuest
+                ? "No account is required — everything works in guest mode."
+                : "Manage your session."
+            }
+          >
             <Button
               size="sm"
               variant="outline"
               onClick={() => {
-                void logout();
-                window.location.href = "/";
+                if (isGuest) {
+                  window.location.href = "/login";
+                } else {
+                  void logout();
+                  window.location.href = "/";
+                }
               }}
             >
-              Sign out
+              {isGuest ? "Sign in" : "Sign out"}
             </Button>
           </Section>
         </div>

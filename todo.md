@@ -1,58 +1,27 @@
-# Visstya AI — Project TODO
+# Visstya AI — Standalone Frontend Architecture
 
-## Architecture & Setup
-- [x] Initialize web-db-user project scaffold
-- [x] Create database schema (verifications, reports, users)
-- [x] Set up environment variables for external APIs (Gemini, OpenWeatherMap, Nominatim, Fact Check APIs)
-- [ ] Set up file storage for media uploads (S3 integration)
+## Clean Architecture & Setup
+- [x] Converted to 100% standalone frontend application (no backend or database required)
+- [x] Client-side verification engine with dynamic analysis simulation
+- [x] Client-side authentication store with local storage persistence
+- [x] Clean environment configuration without backend secrets
+- [x] Removed obsolete backend template files and database scaffolding
 
-## Backend — Verification Modules
-- [x] Module 1: Metadata Analysis (EXIF extraction, integrity checks, score /15)
-- [x] Module 2: Vision Analysis (Gemini 2.5 Flash integration, claim consistency, score /25)
-- [x] Module 3: Weather Verification (Nominatim geocoding, OpenWeatherMap API integration, conditional skip for indoor scenes, score /25)
-- [x] Module 4: Evidence Corroboration (Search queries, news verification with trusted sources, veracity scoring, score /35)
-- [x] Trust Engine Orchestrator (parallel execution, score aggregation, status band assignment)
-- [x] tRPC procedures for verification workflow
+## Frontend — Pages & Features
+- [x] Landing page (Hero, vision statement, step-by-step workflow, trust scale)
+- [x] Media verification workflow (Media upload dropzone, EXIF reader, claim input form)
+- [x] Processing pipeline (Real-time multi-step evidence analysis progress indicator)
+- [x] Trust Report view (Score gauge, status badge, module breakdowns, evidence timeline, source cards, AI assistant)
+- [x] Verification history dashboard (List of past verifications, status filters, search)
+- [x] Dashboard overview (Statistics overview, quick actions, recent reports)
+- [x] User authentication (Sign in & sign up with local session store)
+- [x] Settings page (Profile settings, theme configuration, data management)
+- [x] Report sharing (Unique public link view for shareable trust reports)
+- [x] Component showcase (`/showcase` design system UI preview)
 
-## Backend — Data Management
-- [x] Query helpers for storing and retrieving verification reports
-- [x] User verification history queries
-- [x] Report sharing/access control logic
-- [ ] Unit tests for verification modules and Trust Engine
-
-## Frontend — Pages & Components
-- [x] Landing page (hero, vision statement, CTA, smooth scrolling)
-- [x] Media upload page (file/URL input, claim fields, form validation)
-- [x] Trust Report page (score gauge, status badge, module cards, narrative)
-- [x] Verification history page (list of past reports, filters)
-- [x] Navigation & routing structure
-- [x] Report sharing/detail page (unique link, read-only view)
-
-## Frontend — Design & UX
-- [x] Neo-minimalist design system (color palette, typography, spacing)
-- [x] Responsive layout (mobile-first, breakpoints)
-- [x] Smooth page transitions and animations
-- [x] Skeleton loading states
-- [x] Staggered entrance animations
-- [x] Animated trust score gauge
-- [x] Status badge styling (FALSE, AVERAGE, TRUSTABLE)
-
-## Frontend — Integration
-- [x] Connect upload form to verification API
-- [x] Implement real-time progress tracking during verification
-- [x] Display module scores and findings in report
-- [x] Implement verification history list
-- [x] Add report sharing functionality
-- [x] Error handling and user feedback
-
-## Testing & Polish
-- [x] Vitest unit tests for backend procedures
-- [x] End-to-end testing of verification flow
-- [x] Mobile responsiveness testing
-- [x] Animation performance optimization
-- [x] Accessibility audit (keyboard nav, contrast, focus states)
-
-## Deployment
-- [x] Create final checkpoint
-- [x] Verify all features working in preview
-- [x] Prepare for publish
+## Design & UI Excellence
+- [x] Dual-theme support (Dark Veil cyber aesthetic & Minimalist Light theme)
+- [x] Smooth route transitions via Framer Motion
+- [x] Interactive particle canvas header (`ParticleText`)
+- [x] Dynamic background visual effects (`DotField`, `LightRays`, `ColorBends`)
+- [x] Responsive layout across desktop, tablet, and mobile devices

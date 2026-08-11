@@ -1,3 +1,4 @@
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Logo } from "./Logo";
 import { ArrowRight, Disc3, Menu, Settings, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -14,8 +15,16 @@ const ANCHOR_LINKS = [
 
 export function Navbar() {
   const [location, setLocation] = useLocation();
+  const { user, isGuest } = useAuth();
   const [open, setOpen] = useState(false);
   const [wheelOpen, setWheelOpen] = useState(false);
+
+  const initials = (user?.name ?? "V")
+    .split(" ")
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   const go = (href: string) => {
     setOpen(false);
@@ -77,10 +86,19 @@ export function Navbar() {
           </button>
           <button
             type="button"
-            onClick={() => startLogin()}
-            className="hidden rounded-md px-3 py-1.5 text-sm font-medium text-[hsl(var(--foreground))] transition-colors hover:bg-[hsl(262_70%_85%)] dark:hover:bg-[hsl(var(--secondary))] lg:block"
+            onClick={() => (isGuest ? startLogin() : setLocation("/dashboard"))}
+            className="hidden items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-[hsl(var(--foreground))] transition-colors hover:bg-[hsl(262_70%_85%)] dark:hover:bg-[hsl(var(--secondary))] lg:inline-flex"
           >
-            Sign in
+            {isGuest ? (
+              "Sign in"
+            ) : (
+              <>
+                <span className="flex size-6 items-center justify-center rounded-full bg-[hsl(var(--secondary))] text-[10px] font-semibold">
+                  {initials}
+                </span>
+                {user?.name ?? "Account"}
+              </>
+            )}
           </button>
           <button
             type="button"

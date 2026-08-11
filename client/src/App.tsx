@@ -10,6 +10,7 @@ import Dashboard from "@/pages/Dashboard";
 import Settings from "@/pages/Settings";
 import Share from "@/pages/Share";
 import Login from "@/pages/Login";
+import ComponentShowcase from "@/pages/ComponentShowcase";
 import { AnimatePresence, motion } from "framer-motion";
 import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -38,6 +39,7 @@ function AnimatedRoutes() {
           <Route path={"/dashboard"} component={Dashboard} />
           <Route path={"/settings"} component={Settings} />
           <Route path={"/share/:token"} component={Share} />
+          <Route path={"/showcase"} component={ComponentShowcase} />
           <Route path={"/404"} component={NotFound} />
           {/* Final fallback route */}
           <Route component={NotFound} />

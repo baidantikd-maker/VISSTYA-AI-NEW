@@ -1,26 +1,10 @@
 import DarkVeil from "@/components/DarkVeil";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
+import { authStore } from "@/lib/auth";
 import { useTheme } from "@/contexts/ThemeContext";
-import { getBrowserSupabase } from "@/lib/supabase";
 import { useState } from "react";
 import { useLocation } from "wouter";
-
-async function persistSession(accessToken: string, refreshToken?: string) {
-  const persist = await fetch("/api/auth/session", {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    }),
-  });
-  if (!persist.ok) {
-    const body = await persist.json().catch(() => ({}));
-    throw new Error(body.error || "Failed to persist session");
-  }
-}
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -41,48 +25,12 @@ export default function Login() {
     setBusy(true);
 
     try {
-      const supabase = getBrowserSupabase();
+      authStore.signIn(email, password, mode === "signup" ? name : undefined);
 
       if (mode === "signup") {
-        const { data, error: signUpError } = await supabase.auth.signUp({
-          email: email.trim(),
-          password,
-          options: {
-            data: { full_name: name.trim() || undefined },
-          },
-        });
-        if (signUpError) throw signUpError;
-
-        if (data.session?.access_token) {
-          await persistSession(
-            data.session.access_token,
-            data.session.refresh_token
-          );
-          setLocation("/dashboard");
-          return;
-        }
-
-        setInfo(
-          "Account created. Check your email to confirm, then sign in."
-        );
-        setMode("signin");
-        return;
+        setInfo("Account created. You're signed in.");
       }
 
-      const { data, error: signInError } =
-        await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password,
-        });
-      if (signInError) throw signInError;
-      if (!data.session?.access_token) {
-        throw new Error("No session returned from Supabase");
-      }
-
-      await persistSession(
-        data.session.access_token,
-        data.session.refresh_token
-      );
       setLocation("/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Authentication failed");
@@ -129,7 +77,7 @@ export default function Login() {
               {mode === "signin" ? "Sign in" : "Create account"}
             </h1>
             <p className="mt-3 text-sm text-[hsl(var(--muted))]">
-              Use your email and password with Supabase Auth.
+              Your session is saved locally in this browser.
             </p>
           </div>
 
@@ -237,6 +185,26 @@ export default function Login() {
                 </button>
               </>
             )}
+          </p>
+
+          <div className="mt-8 flex items-center gap-3">
+            <div className="h-px flex-1 bg-[hsl(var(--border))]" />
+            <span className="text-xs uppercase tracking-wide text-[hsl(var(--muted))]">
+              or
+            </span>
+            <div className="h-px flex-1 bg-[hsl(var(--border))]" />
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="mt-6 w-full"
+            onClick={() => setLocation("/dashboard")}
+          >
+            Continue as guest
+          </Button>
+          <p className="mt-3 text-center text-xs text-[hsl(var(--muted))]">
+            No account needed — your reports are saved locally in this browser.
           </p>
         </div>
       </div>

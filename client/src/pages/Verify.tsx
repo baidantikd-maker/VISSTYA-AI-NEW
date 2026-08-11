@@ -2,8 +2,8 @@ import { AppShell } from "@/components/AppShell";
 import { ClaimForm } from "@/components/ClaimForm";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useExifPreview } from "@/hooks/useExifPreview";
 import { cn } from "@/lib/utils";
-import { trpc } from "@/lib/trpc";
 import type { AnalysisInput, ClaimContext, MediaInfo } from "@/mock/types";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useState } from "react";
@@ -41,15 +41,9 @@ export default function Verify() {
   const canProceedToContext = Boolean(media);
   const canAnalyze = canProceedToContext && claim.event.trim().length > 2;
 
-  const remoteImageUrl = media?.kind === "image" && /^https?:\/\//i.test(media.url) ? media.url : undefined;
-  const exifQuery = trpc.verification.parseExif.useQuery(
-    { mediaUrl: remoteImageUrl ?? "" },
-    {
-      enabled: Boolean(remoteImageUrl),
-      staleTime: 1000 * 60 * 5,
-      refetchOnWindowFocus: false,
-    }
-  );
+  const exifSourceUrl =
+    media?.kind === "image" && media.url ? media.url : undefined;
+  const exifQuery = useExifPreview(exifSourceUrl);
 
   const submit = () => {
     if (!media || !canAnalyze) return;
@@ -134,11 +128,9 @@ export default function Verify() {
               <div className="mt-6 rounded-3xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-5 text-sm text-[hsl(var(--foreground))] dark:border-white/40 dark:bg-[rgba(255,255,255,0.04)]">
                 <p className="section-label mb-3">EXIF metadata preview</p>
                 {!media ? (
-                  <p className="text-[hsl(var(--muted))]">Add an image URL to inspect EXIF metadata.</p>
+                  <p className="text-[hsl(var(--muted))]">Upload an image to inspect EXIF metadata.</p>
                 ) : media.kind !== "image" ? (
                   <p className="text-[hsl(var(--muted))]">EXIF preview is only available for images.</p>
-                ) : !remoteImageUrl ? (
-                  <p className="text-[hsl(var(--muted))]">EXIF preview requires a public image URL, not a local file.</p>
                 ) : exifQuery.isLoading ? (
                   <p className="text-[hsl(var(--muted))]">Reading EXIF metadata from the image...</p>
                 ) : exifQuery.isError ? (
