@@ -1,0 +1,2409 @@
+==================== package.json ====================
+{
+  "name": "visstya-ai",
+  "version": "1.0.0",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+  "dev": "vite",
+  "server": "tsx server/index.ts",
+  "build": "vite build",
+  "preview": "vite preview",
+  "check": "tsc --noEmit",
+  "format": "prettier --write ."
+},
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-accordion": "^1.2.12",
+    "@radix-ui/react-alert-dialog": "^1.1.15",
+    "@radix-ui/react-aspect-ratio": "^1.1.7",
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-checkbox": "^1.3.3",
+    "@radix-ui/react-collapsible": "^1.1.12",
+    "@radix-ui/react-context-menu": "^2.2.16",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-hover-card": "^1.1.15",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-menubar": "^1.1.16",
+    "@radix-ui/react-navigation-menu": "^1.2.14",
+    "@radix-ui/react-popover": "^1.1.15",
+    "@radix-ui/react-progress": "^1.1.7",
+    "@radix-ui/react-radio-group": "^1.3.8",
+    "@radix-ui/react-scroll-area": "^1.2.10",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slider": "^1.3.6",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-switch": "^1.2.6",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "@radix-ui/react-toggle": "^1.1.10",
+    "@radix-ui/react-toggle-group": "^1.1.11",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "cors": "^2.8.6",
+    "date-fns": "^4.1.0",
+    "embla-carousel-react": "^8.6.0",
+    "exifreader": "^4.42.0",
+    "express": "^5.2.1",
+    "framer-motion": "^12.23.22",
+    "gsap": "^3.15.0",
+    "input-otp": "^1.4.2",
+    "lucide-react": "^0.453.0",
+    "motion": "^13.0.0",
+    "nanoid": "^5.1.5",
+    "next-themes": "^0.4.6",
+    "ogl": "^1.0.11",
+    "react": "^19.2.1",
+    "react-day-picker": "^9.11.1",
+    "react-dom": "^19.2.1",
+    "react-hook-form": "^7.64.0",
+    "react-resizable-panels": "^3.0.6",
+    "recharts": "^2.15.2",
+    "sonner": "^2.0.7",
+    "streamdown": "^1.4.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
+    "three": "^0.185.1",
+    "vaul": "^1.1.2",
+    "wouter": "^3.3.5",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@builder.io/vite-plugin-jsx-loc": "^0.1.1",
+    "@tailwindcss/typography": "^0.5.15",
+    "@tailwindcss/vite": "^4.1.3",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/google.maps": "^3.58.1",
+    "@types/node": "^24.7.0",
+    "@types/react": "^19.2.1",
+    "@types/react-dom": "^19.2.1",
+    "@types/three": "^0.185.4",
+    "@vitejs/plugin-react": "^5.0.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "prettier": "^3.6.2",
+    "tailwindcss": "^4.1.14",
+    "tsx": "^4.23.12",
+    "tw-animate-css": "^1.4.0",
+    "typescript": "^5.7.3",
+    "vite": "^7.1.7"
+  }
+}
+
+==================== tsconfig.json ====================
+{
+  "include": ["client/src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"],
+  "compilerOptions": {
+    "incremental": true,
+    "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
+    "noEmit": true,
+    "module": "ESNext",
+    "strict": true,
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "jsx": "preserve",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "types": ["node", "vite/client"],
+    "paths": {
+      "@/*": ["./client/src/*"]
+    }
+  }
+}
+
+==================== server files ====================
+
+==================== C:\Users\VARSHA\Desktop\Tech Souls\VisStya-AI-3.O\VISSTYA-AI-NEW\server\display.ts ====================
+import type {
+  ClaimInput,
+  DisplayResult,
+  ModuleResults,
+  ScoringResult,
+  TrustBand,
+} from "./types";
+
+/**
+ * display.ts
+ *
+ * Converts the raw verification results into the final
+ * human-readable report.
+ *
+ * This file does NOT:
+ * - call external APIs
+ * - inspect the media
+ * - calculate module scores
+ *
+ * It explains the results produced by the verification
+ * modules and scoring engine.
+ */
+
+/**
+ * Convert the internal trust band into natural language.
+ */
+function verdictLabel(band: TrustBand): string {
+  switch (band) {
+    case "HIGH":
+      return "strongly supported";
+
+    case "MEDIUM":
+      return "partially supported";
+
+    case "LOW":
+      return "not sufficiently supported";
+
+    default:
+      return "uncertain";
+  }
+}
+
+/**
+ * Collect the strongest findings from all modules.
+ *
+ * These are used to build a summary around actual evidence,
+ * rather than around the numerical score.
+ */
+function collectImportantFindings(
+  modules: ModuleResults
+): string[] {
+  const findings: string[] = [];
+
+  const allModules = [
+    modules.metadata,
+    modules.vision,
+    modules.weather,
+    modules.evidence,
+  ];
+
+  for (const module of allModules) {
+    for (const finding of module.findings) {
+      if (
+        finding.tone === "good" ||
+        finding.tone === "bad" ||
+        finding.tone === "warn"
+      ) {
+        findings.push(
+          `${finding.label}: ${finding.value}`
+        );
+      }
+    }
+  }
+
+  return findings;
+}
+
+/**
+ * Collect warnings from every module.
+ */
+function collectWarnings(
+  modules: ModuleResults
+): string[] {
+  return Array.from(
+    new Set([
+      ...modules.metadata.warnings,
+      ...modules.vision.warnings,
+      ...modules.weather.warnings,
+      ...modules.evidence.warnings,
+    ])
+  );
+}
+
+/**
+ * Create the main content-centric summary.
+ */
+function buildSummary(
+  claim: ClaimInput,
+  modules: ModuleResults,
+  scoring: ScoringResult
+): string {
+  const claimText = claim.event.trim();
+
+  const verdict = verdictLabel(scoring.band);
+
+  const importantFindings =
+    collectImportantFindings(modules);
+
+  const missing = scoring.missing;
+
+  const warnings = collectWarnings(modules);
+
+  /**
+   * Start with the overall evidence interpretation.
+   */
+  let summary =
+    `The claim that "${claimText}" is ${verdict} based on the evidence currently available.`;
+
+  /**
+   * Add the most relevant findings.
+   *
+   * We deliberately describe findings rather than
+   * exposing the score as the main explanation.
+   */
+  if (importantFindings.length > 0) {
+    const selectedFindings =
+      importantFindings.slice(0, 4);
+
+    summary +=
+      ` Key findings include ${selectedFindings.join(
+        "; "
+      )}.`;
+  }
+
+  /**
+   * Explain limitations.
+   */
+  if (missing.length > 0) {
+    const selectedMissing =
+      missing.slice(0, 3);
+
+    summary +=
+      ` Verification is limited because ${selectedMissing.join(
+        "; "
+      ).toLowerCase()}.`;
+  }
+
+  /**
+   * Mention warnings when they materially affect
+   * confidence in the result.
+   */
+  if (warnings.length > 0) {
+    const selectedWarnings =
+      warnings.slice(0, 2);
+
+    summary +=
+      ` Important caveats: ${selectedWarnings.join(
+        "; "
+      )}.`;
+  }
+
+  return summary;
+}
+
+/**
+ * Build limitations for the final report.
+ */
+function buildLimitations(
+  modules: ModuleResults,
+  scoring: ScoringResult
+): string[] {
+  const limitations = new Set<string>();
+
+  /**
+   * Missing information from scoring.
+   */
+  for (const item of scoring.missing) {
+    limitations.add(item);
+  }
+
+  /**
+   * Module warnings.
+   */
+  const warnings = collectWarnings(modules);
+
+  for (const warning of warnings) {
+    limitations.add(warning);
+  }
+
+  /**
+   * Generic limitation that prevents the UI from
+   * presenting the result as absolute truth.
+   */
+  limitations.add(
+    "The assessment reflects the evidence available to the verification engine and can change if new evidence becomes available."
+  );
+
+  return Array.from(limitations);
+}
+
+/**
+ * Generate the final display result.
+ */
+export function buildDisplayResult(
+  claim: ClaimInput,
+  modules: ModuleResults,
+  scoring: ScoringResult
+): DisplayResult {
+  const summary = buildSummary(
+    claim,
+    modules,
+    scoring
+  );
+
+  const limitations =
+    buildLimitations(
+      modules,
+      scoring
+    );
+
+  return {
+    verdict: scoring.band,
+
+    summary,
+
+    modules,
+
+    scoring,
+
+    limitations,
+  };
+}
+
+export default buildDisplayResult;
+
+==================== C:\Users\VARSHA\Desktop\Tech Souls\VisStya-AI-3.O\VISSTYA-AI-NEW\server\index.ts ====================
+import verifyRouter from "./routes/verify.js";
+import express from "express";
+import cors from "cors";
+
+const app = express();
+
+const PORT = Number(process.env.PORT) || 5000;
+
+/**
+ * Middleware
+ */
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+
+app.use(express.json());
+
+/**
+ * Health check
+ *
+ * Used to confirm that the backend is alive.
+ */
+app.get("/api/health", (_req, res) => {
+  res.json({
+    ok: true,
+    service: "Visstya AI",
+    message: "Backend is running",
+  });
+});
+
+app.use("/api/verify", verifyRouter);
+/**
+ * Verification endpoint
+ *
+ * This is intentionally only a skeleton for now.
+ *
+ * Later this endpoint will:
+ *
+ * 1. Receive media + claim context
+ * 2. Run metadata verification
+ * 3. Run vision analysis
+ * 4. Run weather verification
+ * 5. Gather evidence
+ * 6. Send module results to scoring.ts
+ * 7. Send scores + missing information to display.ts
+ * 8. Return the final verification report
+ */
+app.post("/api/verify", async (req, res) => {
+  try {
+    console.log("Verification request received");
+
+    const { media, claim } = req.body;
+
+    if (!media || !claim) {
+      return res.status(400).json({
+        ok: false,
+        error: "Media and claim information are required",
+      });
+    }
+
+    /**
+     * Real verification pipeline will be connected here.
+     */
+    return res.json({
+      ok: true,
+      message: "Verification request received",
+      status: "pending",
+    });
+  } catch (error) {
+    console.error("Verification error:", error);
+
+    return res.status(500).json({
+      ok: false,
+      error: "Internal server error",
+    });
+  }
+});
+
+/**
+ * 404 handler
+ */
+app.use((_req, res) => {
+  res.status(404).json({
+    ok: false,
+    error: "Route not found",
+  });
+});
+
+/**
+ * Start server
+ */
+app.listen(PORT, () => {
+  console.log(`\n🚀 Visstya AI backend running`);
+  console.log(`📡 API: http://localhost:${PORT}`);
+  console.log(`❤️  Health: http://localhost:${PORT}/api/health`);
+  console.log(`🔍 Verify: POST http://localhost:${PORT}/api/verify\n`);
+});
+
+==================== C:\Users\VARSHA\Desktop\Tech Souls\VisStya-AI-3.O\VISSTYA-AI-NEW\server\scoring.ts ====================
+import type {
+  ModuleResults,
+  ScoringResult,
+  TrustBand,
+} from "./types";
+
+/**
+ * Maximum score contributed by each verification module.
+ *
+ * These weights represent the importance of each signal
+ * in the overall verification assessment.
+ */
+const MODULE_MAX_SCORES = {
+  metadata: 15,
+  vision: 25,
+  weather: 25,
+  evidence: 35,
+} as const;
+
+/**
+ * Determine the final trust band from the normalized score.
+ *
+ * HIGH:
+ * Strong overall evidence support.
+ *
+ * MEDIUM:
+ * Mixed or incomplete evidence.
+ *
+ * LOW:
+ * Weak evidence or significant contradictions.
+ */
+function getTrustBand(score: number): TrustBand {
+  if (score >= 75) {
+    return "HIGH";
+  }
+
+  if (score >= 50) {
+    return "MEDIUM";
+  }
+
+  return "LOW";
+}
+
+/**
+ * Make sure a module score stays inside its
+ * allowed range.
+ *
+ * This protects the scoring engine if a module
+ * accidentally returns an invalid score.
+ */
+function clampScore(score: number, maxScore: number): number {
+  if (!Number.isFinite(score)) {
+    return 0;
+  }
+
+  return Math.min(
+    Math.max(score, 0),
+    maxScore
+  );
+}
+
+/**
+ * Calculate the combined verification score.
+ *
+ * This function does NOT:
+ * - call APIs
+ * - inspect media
+ * - search the web
+ * - generate the final summary
+ *
+ * It only combines the results produced by
+ * metadata, vision, weather and evidence.
+ */
+export function calculateScore(
+  modules: ModuleResults
+): ScoringResult {
+  /**
+   * -------------------------------------------------------
+   * 1. Normalize individual module scores
+   * -------------------------------------------------------
+   */
+
+  const metadataScore = clampScore(
+    modules.metadata.score,
+    MODULE_MAX_SCORES.metadata
+  );
+
+  const visionScore = clampScore(
+    modules.vision.score,
+    MODULE_MAX_SCORES.vision
+  );
+
+  const weatherScore = clampScore(
+    modules.weather.score,
+    MODULE_MAX_SCORES.weather
+  );
+
+  const evidenceScore = clampScore(
+    modules.evidence.score,
+    MODULE_MAX_SCORES.evidence
+  );
+
+  /**
+   * -------------------------------------------------------
+   * 2. Calculate total
+   * -------------------------------------------------------
+   *
+   * Maximum possible:
+   *
+   * 15 + 25 + 25 + 35 = 100
+   */
+
+  const totalScore =
+    metadataScore +
+    visionScore +
+    weatherScore +
+    evidenceScore;
+
+  const maxScore =
+    MODULE_MAX_SCORES.metadata +
+    MODULE_MAX_SCORES.vision +
+    MODULE_MAX_SCORES.weather +
+    MODULE_MAX_SCORES.evidence;
+
+  /**
+   * -------------------------------------------------------
+   * 3. Calculate normalized percentage
+   * -------------------------------------------------------
+   *
+   * This is technically redundant because the current
+   * maximum is 100, but keeping it makes the engine safer
+   * if the weights change later.
+   */
+
+  const percentage = Math.round(
+    (totalScore / maxScore) * 100
+  );
+
+  /**
+   * -------------------------------------------------------
+   * 4. Determine final trust band
+   * -------------------------------------------------------
+   */
+
+  const band = getTrustBand(percentage);
+
+  /**
+   * -------------------------------------------------------
+   * 5. Combine missing information
+   * -------------------------------------------------------
+   *
+   * Each module independently reports what it could not
+   * establish.
+   *
+   * display.ts will later use this collection to explain
+   * why the result is limited or uncertain.
+   */
+
+  const missing = Array.from(
+    new Set([
+      ...modules.metadata.missing,
+      ...modules.vision.missing,
+      ...modules.weather.missing,
+      ...modules.evidence.missing,
+    ])
+  );
+
+  /**
+   * -------------------------------------------------------
+   * 6. Return the complete scoring result
+   * -------------------------------------------------------
+   */
+
+  return {
+    totalScore,
+    maxScore,
+    percentage,
+    band,
+
+    moduleScores: {
+      metadata: metadataScore,
+      vision: visionScore,
+      weather: weatherScore,
+      evidence: evidenceScore,
+    },
+
+    missing,
+  };
+}
+
+export default calculateScore;
+
+==================== C:\Users\VARSHA\Desktop\Tech Souls\VisStya-AI-3.O\VISSTYA-AI-NEW\server\types.ts ====================
+export type TrustBand = "HIGH" | "MEDIUM" | "LOW";
+
+export type FindingTone = "good" | "warn" | "bad" | "neutral";
+
+/**
+ * Information supplied by the user.
+ */
+export interface ClaimInput {
+  event: string;
+  location?: string;
+  date?: string;
+}
+
+/**
+ * Media supplied for verification.
+ */
+export interface MediaInput {
+  kind: "image" | "video";
+  url?: string;
+  name?: string;
+  mimeType?: string;
+}
+
+/**
+ * A single finding produced by any verification module.
+ */
+export interface ModuleFinding {
+  label: string;
+  value: string;
+  tone: FindingTone;
+}
+
+/**
+ * Common result structure returned by every module.
+ */
+export interface ModuleResult {
+  score: number;
+  maxScore: number;
+
+  summary: string;
+
+  findings: ModuleFinding[];
+
+  /**
+   * Things the module could not determine.
+   * These will later be used by display.ts
+   * to generate a content-centric summary.
+   */
+  missing: string[];
+
+  /**
+   * Warnings or suspicious signals discovered
+   * during the module's analysis.
+   */
+  warnings: string[];
+
+  /**
+   * Raw/structured data produced by the module.
+   * Kept flexible because every module produces
+   * different kinds of data.
+   */
+  data: Record<string, unknown>;
+}
+
+/**
+ * Results from all four verification modules.
+ */
+export interface ModuleResults {
+  metadata: ModuleResult;
+  vision: ModuleResult;
+  weather: ModuleResult;
+  evidence: ModuleResult;
+}
+
+/**
+ * Final result generated by scoring.ts.
+ */
+export interface ScoringResult {
+  totalScore: number;
+  maxScore: number;
+
+  /**
+   * Score normalized to 0–100.
+   * This is for internal calculation/display
+   * where needed, not necessarily the main UI summary.
+   */
+  percentage: number;
+
+  band: TrustBand;
+
+  /**
+   * Explains which modules contributed most
+   * or least to the final assessment.
+   */
+  moduleScores: {
+    metadata: number;
+    vision: number;
+    weather: number;
+    evidence: number;
+  };
+
+  /**
+   * Combined missing information from all modules.
+   */
+  missing: string[];
+}
+
+/**
+ * Final content generated by display.ts.
+ */
+export interface DisplayResult {
+  verdict: TrustBand;
+
+  /**
+   * Main human-readable explanation.
+   * This should focus on WHAT the evidence says,
+   * not just the numerical score.
+   */
+  summary: string;
+
+  /**
+   * Information shown independently inside
+   * each module's frontend box.
+   */
+  keyFindings: string[];
+  modules: ModuleResults;
+
+  /**
+   * Final scoring information.
+   */
+  scoring: ScoringResult;
+
+  /**
+   * Important things the user should know
+   * before trusting the result.
+   */
+  limitations: string[];
+}
+
+/**
+ * Complete request received by /api/verify.
+ */
+export interface VerificationRequest {
+  media: MediaInput;
+  claim: ClaimInput;
+}
+
+/**
+ * Complete backend response returned by /api/verify.
+ */
+export interface VerificationResponse {
+  ok: boolean;
+
+  report?: DisplayResult;
+
+  error?: string;
+}
+
+==================== C:\Users\VARSHA\Desktop\Tech Souls\VisStya-AI-3.O\VISSTYA-AI-NEW\server\modules\evidence.ts ====================
+import type {
+  ClaimInput,
+  ModuleFinding,
+  ModuleResult,
+} from "../types";
+
+/**
+ * Evidence verification module
+ *
+ * Purpose:
+ * - Look for independent, dated sources related to the claim.
+ * - Determine whether the available evidence supports,
+ *   contradicts, or fails to establish the claim.
+ *
+ * This module deliberately does NOT invent evidence.
+ * Until a real evidence/search provider is connected,
+ * missing information is reported explicitly.
+ */
+
+interface EvidenceSource {
+  title: string;
+  url: string;
+  publisher?: string;
+  publishedAt?: string;
+  snippet?: string;
+  relation: "supporting" | "contradicting" | "inconclusive";
+}
+
+interface EvidenceData {
+  query: string;
+  sources: EvidenceSource[];
+  supportingCount: number;
+  contradictingCount: number;
+  inconclusiveCount: number;
+}
+
+/**
+ * Build a search query from the user's claim.
+ */
+function buildEvidenceQuery(claim: ClaimInput): string {
+  const parts = [
+    claim.event,
+    claim.location,
+    claim.date,
+  ].filter(Boolean);
+
+  return parts.join(" ");
+}
+
+/**
+ * Analyse evidence for a claim.
+ *
+ * IMPORTANT:
+ * The real external evidence API/search provider will be
+ * connected inside this function later.
+ */
+export async function analyzeEvidence(
+  claim: ClaimInput
+): Promise<ModuleResult> {
+  const query = buildEvidenceQuery(claim);
+
+  const findings: ModuleFinding[] = [];
+  const warnings: string[] = [];
+  const missing: string[] = [];
+
+  /**
+   * -------------------------------------------------------
+   * REAL EVIDENCE PROVIDER WILL GO HERE
+   * -------------------------------------------------------
+   *
+   * Example future flow:
+   *
+   * const sources = await searchEvidence(query);
+   *
+   * Then classify each source as:
+   * - supporting
+   * - contradicting
+   * - inconclusive
+   *
+   * We are NOT putting fake sources here.
+   */
+
+  const sources: EvidenceSource[] = [];
+
+  /**
+   * No real evidence provider has been connected yet.
+   */
+  if (sources.length === 0) {
+    missing.push(
+      "Independent dated sources could not be retrieved."
+    );
+
+    missing.push(
+      "No external reporting is currently available for corroboration."
+    );
+
+    warnings.push(
+      "Evidence verification is incomplete because the external evidence provider is not connected."
+    );
+
+    findings.push({
+      label: "Independent sources",
+      value: "Not retrieved",
+      tone: "neutral",
+    });
+
+    findings.push({
+      label: "Supporting evidence",
+      value: "Not established",
+      tone: "neutral",
+    });
+
+    findings.push({
+      label: "Contradicting evidence",
+      value: "Not established",
+      tone: "neutral",
+    });
+
+    return {
+      score: 0,
+      maxScore: 35,
+
+      summary:
+        "Independent evidence could not yet be retrieved, so the claim cannot be corroborated or contradicted by external sources.",
+
+      findings,
+
+      missing,
+
+      warnings,
+
+      data: {
+        query,
+        sources,
+        supportingCount: 0,
+        contradictingCount: 0,
+        inconclusiveCount: 0,
+      } satisfies EvidenceData,
+    };
+  }
+
+  /**
+   * -------------------------------------------------------
+   * Evidence scoring
+   * -------------------------------------------------------
+   *
+   * Once real sources are available:
+   *
+   * - supporting sources increase the score
+   * - contradicting sources decrease the score
+   * - inconclusive sources provide context but little score
+   */
+
+  const supportingCount = sources.filter(
+    (source) => source.relation === "supporting"
+  ).length;
+
+  const contradictingCount = sources.filter(
+    (source) => source.relation === "contradicting"
+  ).length;
+
+  const inconclusiveCount = sources.filter(
+    (source) => source.relation === "inconclusive"
+  ).length;
+
+  const totalSources = sources.length;
+
+  let score = 0;
+
+  if (totalSources > 0) {
+    const supportingWeight = supportingCount * 1;
+    const contradictingWeight = contradictingCount * -1;
+    const netEvidence = supportingWeight + contradictingWeight;
+
+    /**
+     * Convert the evidence balance into a 0–35 score.
+     *
+     * This is intentionally conservative:
+     * a few sources should not automatically produce
+     * a near-perfect trust score.
+     */
+    const normalized =
+      (netEvidence + totalSources) /
+      (2 * totalSources);
+
+    score = Math.round(normalized * 35);
+  }
+
+  /**
+   * Findings shown independently in the Evidence box
+   * on the frontend.
+   */
+  findings.push({
+    label: "Independent sources",
+    value: `${totalSources} retrieved`,
+    tone: totalSources > 0 ? "good" : "neutral",
+  });
+
+  findings.push({
+    label: "Supporting sources",
+    value: `${supportingCount}`,
+    tone: supportingCount > 0 ? "good" : "neutral",
+  });
+
+  findings.push({
+    label: "Contradicting sources",
+    value: `${contradictingCount}`,
+    tone: contradictingCount > 0 ? "bad" : "neutral",
+  });
+
+  if (inconclusiveCount > 0) {
+    findings.push({
+      label: "Inconclusive sources",
+      value: `${inconclusiveCount}`,
+      tone: "warn",
+    });
+  }
+
+  /**
+   * Missing information is important because display.ts
+   * will later use it to create the content-centric summary.
+   */
+  if (supportingCount === 0) {
+    missing.push(
+      "No independent source currently confirms the claim."
+    );
+  }
+
+  if (contradictingCount === 0) {
+    missing.push(
+      "No independent source currently contradicts the claim."
+    );
+  }
+
+  /**
+   * Final human-readable module summary.
+   */
+  let summary: string;
+
+  if (contradictingCount > supportingCount) {
+    summary =
+      "Available evidence contains more contradicting sources than supporting sources.";
+  } else if (supportingCount > contradictingCount) {
+    summary =
+      "Available evidence contains more supporting sources than contradicting sources.";
+  } else {
+    summary =
+      "Available evidence is mixed or inconclusive.";
+  }
+
+  return {
+    score,
+    maxScore: 35,
+
+    summary,
+
+    findings,
+
+    missing,
+
+    warnings,
+
+    data: {
+      query,
+      sources,
+      supportingCount,
+      contradictingCount,
+      inconclusiveCount,
+    } satisfies EvidenceData,
+  };
+}
+
+export default analyzeEvidence;
+
+==================== C:\Users\VARSHA\Desktop\Tech Souls\VisStya-AI-3.O\VISSTYA-AI-NEW\server\modules\metadata.ts ====================
+import type {
+  ClaimInput,
+  MediaInput,
+  ModuleResult,
+} from "../types.js";
+
+/**
+ * Metadata verification module.
+ *
+ * Responsibility:
+ * - Inspect media metadata/provenance signals.
+ * - Report available information.
+ * - Report missing information.
+ * - Produce a metadata-specific score.
+ *
+ * This module does NOT decide whether the overall claim is true.
+ * The final decision belongs to scoring.ts + display.ts.
+ */
+
+interface MetadataData {
+  mediaKind: MediaInput["kind"];
+  hasUrl: boolean;
+  urlType: "http" | "data" | "blob" | "none";
+  fileName?: string;
+  mimeType?: string;
+  metadataAvailable: boolean;
+  metadataFields: Record<string, unknown>;
+}
+
+function getUrlType(
+  url?: string
+): MetadataData["urlType"] {
+  if (!url) return "none";
+
+  if (url.startsWith("data:")) {
+    return "data";
+  }
+
+  if (url.startsWith("blob:")) {
+    return "blob";
+  }
+
+  if (/^https?:\/\//i.test(url)) {
+    return "http";
+  }
+
+  return "none";
+}
+
+/**
+ * Extract basic information from a data URL.
+ *
+ * Example:
+ * data:image/jpeg;base64,...
+ */
+function inspectDataUrl(url: string): {
+  mimeType?: string;
+  hasPayload: boolean;
+} {
+  const match = url.match(
+    /^data:([^;,]+)(?:;[^,]*)?,(.*)$/s
+  );
+
+  if (!match) {
+    return {
+      hasPayload: false,
+    };
+  }
+
+  return {
+    mimeType: match[1],
+    hasPayload: match[2].length > 0,
+  };
+}
+
+/**
+ * Main metadata analysis function.
+ */
+export async function analyzeMetadata(
+  media: MediaInput,
+  _claim: ClaimInput
+): Promise<ModuleResult> {
+  const missing: string[] = [];
+  const warnings: string[] = [];
+  const findings: ModuleResult["findings"] = [];
+
+  const urlType = getUrlType(media.url);
+
+  let metadataAvailable = false;
+  let detectedMimeType = media.mimeType;
+
+  /**
+   * Basic media information.
+   */
+  const hasUrl = Boolean(media.url);
+
+  if (!media.url) {
+    missing.push("Original media URL or file payload");
+  }
+
+  if (!media.name) {
+    missing.push("Original filename");
+  }
+
+  if (!media.mimeType) {
+    missing.push("MIME type");
+  }
+
+  /**
+   * Data URL inspection.
+   *
+   * This does NOT yet parse EXIF.
+   * It only confirms that the data URL contains
+   * a recognizable media payload.
+   */
+  if (urlType === "data" && media.url) {
+    const inspected = inspectDataUrl(media.url);
+
+    if (inspected.mimeType) {
+      detectedMimeType = inspected.mimeType;
+    }
+
+    if (inspected.hasPayload) {
+      metadataAvailable = true;
+    } else {
+      warnings.push("Data URL contains no usable payload");
+    }
+  }
+
+  /**
+   * Blob URLs are browser-local references.
+   * The backend cannot reliably inspect their original
+   * metadata because the blob belongs to the browser.
+   */
+  if (urlType === "blob") {
+    missing.push(
+      "Server-accessible original media; browser blob URL cannot be inspected directly"
+    );
+
+    warnings.push(
+      "Media was supplied as a browser-local blob URL"
+    );
+  }
+
+  /**
+   * HTTP URLs can potentially be inspected later.
+   *
+   * We deliberately do not fetch arbitrary URLs here yet.
+   * That will be implemented safely once the media-ingestion
+   * layer is established.
+   */
+  if (urlType === "http") {
+    metadataAvailable = true;
+
+    findings.push({
+      label: "Media source",
+      value: "Publicly accessible URL provided",
+      tone: "good",
+    });
+  }
+
+  /**
+   * Media type.
+   */
+  findings.push({
+    label: "Media type",
+    value: media.kind,
+    tone: media.kind === "image" ? "good" : "neutral",
+  });
+
+  /**
+   * Filename.
+   */
+  if (media.name) {
+    findings.push({
+      label: "Filename",
+      value: media.name,
+      tone: "good",
+    });
+  } else {
+    findings.push({
+      label: "Filename",
+      value: "Not provided",
+      tone: "warn",
+    });
+  }
+
+  /**
+   * MIME type.
+   */
+  if (detectedMimeType) {
+    findings.push({
+      label: "MIME type",
+      value: detectedMimeType,
+      tone: "good",
+    });
+  } else {
+    findings.push({
+      label: "MIME type",
+      value: "Not available",
+      tone: "warn",
+    });
+  }
+
+  /**
+   * EXIF status.
+   *
+   * We are intentionally NOT claiming EXIF has been extracted yet.
+   * That will be added using a proper EXIF parser/ingestion path.
+   */
+  findings.push({
+    label: "EXIF metadata",
+    value: "Not yet extracted",
+    tone: "warn",
+  });
+
+  missing.push(
+    "Camera metadata, capture timestamp and GPS coordinates require EXIF extraction from the original image"
+  );
+
+  /**
+   * Re-encoding/provenance.
+   *
+   * We cannot determine this reliably from the current
+   * browser URL alone, so it remains an unresolved signal.
+   */
+  missing.push(
+    "Original encoding/provenance history"
+  );
+
+  /**
+   * Score calculation.
+   *
+   * Maximum metadata contribution = 15.
+   *
+   * This is intentionally conservative:
+   * available metadata earns points,
+   * but missing metadata does not automatically mean
+   * the content is false.
+   */
+  let score = 0;
+
+  if (hasUrl) {
+    score += 3;
+  }
+
+  if (media.name) {
+    score += 2;
+  }
+
+  if (detectedMimeType) {
+    score += 2;
+  }
+
+  if (metadataAvailable) {
+    score += 3;
+  }
+
+  if (urlType === "http") {
+    score += 2;
+  }
+
+  /**
+   * Having an actual media payload is useful,
+   * but we cap the module at 15.
+   */
+  if (media.kind === "image") {
+    score += 1;
+  }
+
+  score = Math.min(score, 15);
+
+  /**
+   * Determine module-level summary.
+   */
+  let summary: string;
+
+  if (score >= 12) {
+    summary =
+      "Basic media metadata is available, but original EXIF and provenance still need to be verified.";
+  } else if (score >= 7) {
+    summary =
+      "Some metadata signals are available, but important provenance and capture information is missing.";
+  } else {
+    summary =
+      "Metadata is limited. Important information about the original capture and provenance could not be verified.";
+  }
+
+  const data: MetadataData = {
+    mediaKind: media.kind,
+    hasUrl,
+    urlType,
+    fileName: media.name,
+    mimeType: detectedMimeType,
+    metadataAvailable,
+    metadataFields: {},
+  };
+
+  return {
+    score,
+    maxScore: 15,
+    summary,
+    findings,
+    missing,
+    warnings,
+    data,
+  };
+}
+
+==================== C:\Users\VARSHA\Desktop\Tech Souls\VisStya-AI-3.O\VISSTYA-AI-NEW\server\modules\vision.ts ====================
+import type {
+  ClaimInput,
+  MediaInput,
+  ModuleResult,
+} from "../types.js";
+
+/**
+ * Vision verification module.
+ *
+ * Responsibility:
+ * - Analyze what is visually present in the media.
+ * - Compare visual observations with the user's claim.
+ * - Identify visual inconsistencies or uncertainty.
+ * - Return findings, missing information and a module score.
+ *
+ * The final truth verdict is NOT decided here.
+ */
+
+interface VisionObservation {
+  sceneDescription: string;
+  claimConsistency: "consistent" | "inconsistent" | "uncertain";
+  manipulationIndicators: string[];
+  generationIndicators: string[];
+  visualCues: string[];
+  confidence: number;
+}
+
+/**
+ * Gemini/provider boundary.
+ *
+ * We keep the actual AI provider isolated here.
+ * When the Gemini API is connected, this function
+ * will send the media + claim to the model and return
+ * structured observations.
+ *
+ * For now it returns null rather than pretending
+ * that an AI analysis happened.
+ */
+async function analyzeWithVisionProvider(
+  _media: MediaInput,
+  _claim: ClaimInput
+): Promise<VisionObservation | null> {
+  return null;
+}
+
+/**
+ * Main vision analysis function.
+ */
+export async function analyzeVision(
+  media: MediaInput,
+  claim: ClaimInput
+): Promise<ModuleResult> {
+  const findings: ModuleResult["findings"] = [];
+  const missing: string[] = [];
+  const warnings: string[] = [];
+
+  /**
+   * Basic media validation.
+   */
+  if (!media.url) {
+    missing.push(
+      "Accessible media payload for visual analysis"
+    );
+  }
+
+  if (media.kind !== "image") {
+    missing.push(
+      "Image-based visual analysis; video analysis is not implemented yet"
+    );
+  }
+
+  /**
+   * Ask the vision provider for observations.
+   *
+   * Currently this returns null because Gemini
+   * has not been connected yet.
+   */
+  const observation = await analyzeWithVisionProvider(
+    media,
+    claim
+  );
+
+  /**
+   * No provider result yet.
+   *
+   * This is intentionally represented as
+   * "not analyzed" rather than "false".
+   */
+  if (!observation) {
+    findings.push({
+      label: "Scene analysis",
+      value: "Vision analysis not yet connected",
+      tone: "warn",
+    });
+
+    findings.push({
+      label: "Claim consistency",
+      value: "Undetermined",
+      tone: "neutral",
+    });
+
+    findings.push({
+      label: "Manipulation indicators",
+      value: "Undetermined",
+      tone: "neutral",
+    });
+
+    findings.push({
+      label: "AI-generation indicators",
+      value: "Undetermined",
+      tone: "neutral",
+    });
+
+    missing.push(
+      "AI-assisted visual scene analysis"
+    );
+
+    missing.push(
+      "Visual comparison between the media and the claim"
+    );
+
+    missing.push(
+      "Reliable manipulation/artifact assessment"
+    );
+
+    warnings.push(
+      "Vision provider is not connected yet"
+    );
+
+    /**
+     * Since the visual evidence has not actually
+     * been analyzed, give it zero verified points.
+     *
+     * This prevents the system from treating
+     * missing analysis as positive evidence.
+     */
+    return {
+      score: 0,
+      maxScore: 25,
+      summary:
+        "Visual evidence could not yet be assessed because the vision analysis provider is not connected.",
+      findings,
+      missing,
+      warnings,
+      data: {
+        analyzed: false,
+        provider: "not-connected",
+        mediaKind: media.kind,
+        claim: claim.event,
+      },
+    };
+  }
+
+  /**
+   * If the provider returns a real observation,
+   * convert it into structured findings.
+   */
+
+  findings.push({
+    label: "Scene description",
+    value: observation.sceneDescription,
+    tone: "neutral",
+  });
+
+  /**
+   * Claim consistency.
+   */
+  if (observation.claimConsistency === "consistent") {
+    findings.push({
+      label: "Claim consistency",
+      value: "Visually consistent with the claim",
+      tone: "good",
+    });
+  } else if (
+    observation.claimConsistency === "inconsistent"
+  ) {
+    findings.push({
+      label: "Claim consistency",
+      value: "Visual details conflict with the claim",
+      tone: "bad",
+    });
+  } else {
+    findings.push({
+      label: "Claim consistency",
+      value: "Cannot be determined confidently",
+      tone: "warn",
+    });
+
+    missing.push(
+      "Clear visual evidence connecting the media to the claim"
+    );
+  }
+
+  /**
+   * Manipulation indicators.
+   */
+  if (observation.manipulationIndicators.length === 0) {
+    findings.push({
+      label: "Manipulation indicators",
+      value: "No obvious indicators detected",
+      tone: "good",
+    });
+  } else {
+    findings.push({
+      label: "Manipulation indicators",
+      value:
+        observation.manipulationIndicators.join("; "),
+      tone: "warn",
+    });
+
+    warnings.push(
+      ...observation.manipulationIndicators
+    );
+  }
+
+  /**
+   * AI-generation indicators.
+   */
+  if (observation.generationIndicators.length === 0) {
+    findings.push({
+      label: "AI-generation indicators",
+      value: "No obvious indicators detected",
+      tone: "good",
+    });
+  } else {
+    findings.push({
+      label: "AI-generation indicators",
+      value:
+        observation.generationIndicators.join("; "),
+      tone: "warn",
+    });
+
+    warnings.push(
+      ...observation.generationIndicators
+    );
+  }
+
+  /**
+   * Additional visual cues.
+   */
+  if (observation.visualCues.length > 0) {
+    findings.push({
+      label: "Visual cues",
+      value: observation.visualCues.join("; "),
+      tone: "neutral",
+    });
+  } else {
+    missing.push(
+      "Additional visual cues useful for independent verification"
+    );
+  }
+
+  /**
+   * Score the visual analysis.
+   *
+   * Maximum = 25.
+   *
+   * This is deliberately simple for now.
+   * Once Gemini is connected, we can define
+   * more rigorous scoring rules based on
+   * structured observations.
+   */
+  let score = 0;
+
+  /**
+   * Strong claim consistency.
+   */
+  if (observation.claimConsistency === "consistent") {
+    score += 10;
+  }
+
+  /**
+   * No manipulation indicators.
+   */
+  if (
+    observation.manipulationIndicators.length === 0
+  ) {
+    score += 5;
+  }
+
+  /**
+   * No obvious AI-generation indicators.
+   */
+  if (
+    observation.generationIndicators.length === 0
+  ) {
+    score += 5;
+  }
+
+  /**
+   * Confidence contribution.
+   */
+  if (observation.confidence >= 0.8) {
+    score += 5;
+  } else if (observation.confidence >= 0.6) {
+    score += 3;
+  } else if (observation.confidence >= 0.4) {
+    score += 1;
+  }
+
+  score = Math.min(score, 25);
+
+  /**
+   * Generate a module-level summary.
+   */
+  let summary: string;
+
+  if (score >= 20) {
+    summary =
+      "Visual analysis strongly supports consistency between the media and the claim.";
+  } else if (score >= 12) {
+    summary =
+      "Visual analysis provides some support, but important visual uncertainties remain.";
+  } else {
+    summary =
+      "Visual analysis found limited support or inconsistencies with the claim.";
+  }
+
+  return {
+    score,
+    maxScore: 25,
+    summary,
+    findings,
+    missing,
+    warnings,
+    data: {
+      analyzed: true,
+      provider: "vision-provider",
+      observation,
+    },
+  };
+}
+
+==================== C:\Users\VARSHA\Desktop\Tech Souls\VisStya-AI-3.O\VISSTYA-AI-NEW\server\modules\weather.ts ====================
+import type {
+  ClaimInput,
+  ModuleFinding,
+  ModuleResult,
+} from "../types.js";
+
+const OPEN_METEO_URL = "https://archive-api.open-meteo.com/v1/archive";
+
+interface OpenMeteoResponse {
+  latitude: number;
+  longitude: number;
+  timezone?: string;
+  hourly?: {
+    time?: string[];
+    temperature_2m?: number[];
+    relative_humidity_2m?: number[];
+    precipitation?: number[];
+    rain?: number[];
+    weather_code?: number[];
+    wind_speed_10m?: number[];
+    surface_pressure?: number[];
+  };
+}
+
+interface Coordinates {
+  latitude: number;
+  longitude: number;
+  resolvedLocation: string;
+}
+
+/**
+ * Convert a user-provided location into coordinates.
+ *
+ * Open-Meteo's weather archive works with latitude/longitude,
+ * so we first resolve the location through Open-Meteo's
+ * geocoding service.
+ */
+async function geocodeLocation(
+  location: string
+): Promise<Coordinates> {
+  const url = new URL(
+    "https://geocoding-api.open-meteo.com/v1/search"
+  );
+
+  url.searchParams.set("name", location);
+  url.searchParams.set("count", "1");
+  url.searchParams.set("language", "en");
+  url.searchParams.set("format", "json");
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(
+      `Weather geocoding failed with status ${response.status}`
+    );
+  }
+
+  const data = (await response.json()) as {
+    results?: Array<{
+      latitude: number;
+      longitude: number;
+      name: string;
+      country?: string;
+      admin1?: string;
+    }>;
+  };
+
+  const result = data.results?.[0];
+
+  if (!result) {
+    throw new Error(`Could not locate "${location}"`);
+  }
+
+  const resolvedLocation = [
+    result.name,
+    result.admin1,
+    result.country,
+  ]
+    .filter(Boolean)
+    .join(", ");
+
+  return {
+    latitude: result.latitude,
+    longitude: result.longitude,
+    resolvedLocation,
+  };
+}
+
+/**
+ * Convert Open-Meteo weather codes into human-readable
+ * descriptions.
+ */
+function weatherCodeDescription(code: number): string {
+  if (code === 0) return "Clear sky";
+
+  if ([1, 2, 3].includes(code)) {
+    return "Cloudy or partly cloudy";
+  }
+
+  if ([45, 48].includes(code)) {
+    return "Fog";
+  }
+
+  if ([51, 53, 55].includes(code)) {
+    return "Drizzle";
+  }
+
+  if ([56, 57].includes(code)) {
+    return "Freezing drizzle";
+  }
+
+  if ([61, 63, 65].includes(code)) {
+    return "Rain";
+  }
+
+  if ([66, 67].includes(code)) {
+    return "Freezing rain";
+  }
+
+  if ([71, 73, 75, 77].includes(code)) {
+    return "Snow or snow grains";
+  }
+
+  if ([80, 81, 82].includes(code)) {
+    return "Rain showers";
+  }
+
+  if ([85, 86].includes(code)) {
+    return "Snow showers";
+  }
+
+  if (code === 95) {
+    return "Thunderstorm";
+  }
+
+  if ([96, 99].includes(code)) {
+    return "Thunderstorm with hail";
+  }
+
+  return "Unknown weather condition";
+}
+
+/**
+ * Calculate an average while safely ignoring missing values.
+ */
+function average(values: number[]): number | null {
+  const valid = values.filter(
+    (value) => typeof value === "number" && Number.isFinite(value)
+  );
+
+  if (valid.length === 0) {
+    return null;
+  }
+
+  return (
+    valid.reduce((sum, value) => sum + value, 0) /
+    valid.length
+  );
+}
+
+/**
+ * Calculate the maximum value while safely ignoring missing values.
+ */
+function maximum(values: number[]): number | null {
+  const valid = values.filter(
+    (value) => typeof value === "number" && Number.isFinite(value)
+  );
+
+  if (valid.length === 0) {
+    return null;
+  }
+
+  return Math.max(...valid);
+}
+
+/**
+ * Fetch historical weather for a location and date.
+ */
+async function fetchHistoricalWeather(
+  coordinates: Coordinates,
+  date: string
+): Promise<OpenMeteoResponse> {
+  const url = new URL(OPEN_METEO_URL);
+
+  url.searchParams.set(
+    "latitude",
+    coordinates.latitude.toString()
+  );
+
+  url.searchParams.set(
+    "longitude",
+    coordinates.longitude.toString()
+  );
+
+  url.searchParams.set("start_date", date);
+  url.searchParams.set("end_date", date);
+
+  url.searchParams.set(
+    "hourly",
+    [
+      "temperature_2m",
+      "relative_humidity_2m",
+      "precipitation",
+      "rain",
+      "weather_code",
+      "wind_speed_10m",
+      "surface_pressure",
+    ].join(",")
+  );
+
+  url.searchParams.set("timezone", "auto");
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(
+      `Open-Meteo request failed with status ${response.status}`
+    );
+  }
+
+  return (await response.json()) as OpenMeteoResponse;
+}
+
+/**
+ * Main weather verification module.
+ *
+ * IMPORTANT:
+ * This module does NOT decide whether the claim is true.
+ * It only determines whether historical weather conditions
+ * are consistent with the supplied location/date and produces
+ * structured evidence for scoring.ts.
+ */
+export async function analyzeWeather(
+  claim: ClaimInput
+): Promise<ModuleResult> {
+  const findings: ModuleFinding[] = [];
+  const missing: string[] = [];
+  const warnings: string[] = [];
+
+  if (!claim.location) {
+    return {
+      score: 0,
+      maxScore: 25,
+      summary:
+        "Weather verification could not be performed because no location was provided.",
+      findings: [
+        {
+          label: "Location",
+          value: "Not provided",
+          tone: "bad",
+        },
+      ],
+      missing: [
+        "Claim location is required for historical weather verification",
+      ],
+      warnings: [],
+      data: {},
+    };
+  }
+
+  if (!claim.date) {
+    return {
+      score: 0,
+      maxScore: 25,
+      summary:
+        "Weather verification could not be performed because no date was provided.",
+      findings: [
+        {
+          label: "Claim date",
+          value: "Not provided",
+          tone: "bad",
+        },
+      ],
+      missing: [
+        "Claim date is required for historical weather verification",
+      ],
+      warnings: [],
+      data: {},
+    };
+  }
+
+  try {
+    const coordinates = await geocodeLocation(claim.location);
+
+    const weather = await fetchHistoricalWeather(
+      coordinates,
+      claim.date
+    );
+
+    const hourly = weather.hourly;
+
+    if (!hourly) {
+      return {
+        score: 0,
+        maxScore: 25,
+        summary:
+          "Weather data was unavailable for the claimed location and date.",
+        findings: [
+          {
+            label: "Historical weather",
+            value: "No hourly data returned",
+            tone: "warn",
+          },
+        ],
+        missing: [
+          "Historical weather observations for the claimed date",
+        ],
+        warnings: [],
+        data: {
+          coordinates,
+          date: claim.date,
+        },
+      };
+    }
+
+    const temperatures = hourly.temperature_2m ?? [];
+    const humidity = hourly.relative_humidity_2m ?? [];
+    const precipitation = hourly.precipitation ?? [];
+    const rain = hourly.rain ?? [];
+    const wind = hourly.wind_speed_10m ?? [];
+    const pressure = hourly.surface_pressure ?? [];
+    const weatherCodes = hourly.weather_code ?? [];
+
+    const averageTemperature = average(temperatures);
+    const averageHumidity = average(humidity);
+    const totalPrecipitation = precipitation.reduce(
+      (sum, value) =>
+        Number.isFinite(value) ? sum + value : sum,
+      0
+    );
+
+    const totalRain = rain.reduce(
+      (sum, value) =>
+        Number.isFinite(value) ? sum + value : sum,
+      0
+    );
+
+    const maximumWind = maximum(wind);
+    const averagePressure = average(pressure);
+
+    const conditions = [
+      ...new Set(
+        weatherCodes
+          .filter(
+            (code): code is number =>
+              typeof code === "number" &&
+              Number.isFinite(code)
+          )
+          .map(weatherCodeDescription)
+      ),
+    ];
+
+    /**
+     * We deliberately give a neutral/supporting score here.
+     *
+     * Weather consistency is evidence, not proof.
+     *
+     * The scoring engine can later combine this with:
+     * metadata + vision + evidence.
+     */
+    let score = 15;
+
+    if (totalPrecipitation > 0) {
+      score += 4;
+
+      findings.push({
+        label: "Precipitation",
+        value: `${totalPrecipitation.toFixed(1)} mm recorded`,
+        tone: "good",
+      });
+    } else {
+      findings.push({
+        label: "Precipitation",
+        value: "No measurable precipitation recorded",
+        tone: "neutral",
+      });
+    }
+
+    if (conditions.length > 0) {
+      findings.push({
+        label: "Weather conditions",
+        value: conditions.join(", "),
+        tone: "good",
+      });
+    } else {
+      missing.push(
+        "Hourly weather condition codes were unavailable"
+      );
+    }
+
+    if (averageTemperature !== null) {
+      findings.push({
+        label: "Average temperature",
+        value: `${averageTemperature.toFixed(1)} °C`,
+        tone: "neutral",
+      });
+    } else {
+      missing.push(
+        "Temperature data was unavailable"
+      );
+    }
+
+    if (averageHumidity !== null) {
+      findings.push({
+        label: "Average humidity",
+        value: `${averageHumidity.toFixed(0)}%`,
+        tone: "neutral",
+      });
+    } else {
+      missing.push(
+        "Humidity data was unavailable"
+      );
+    }
+
+    if (maximumWind !== null) {
+      findings.push({
+        label: "Maximum wind",
+        value: `${maximumWind.toFixed(1)} km/h`,
+        tone: "neutral",
+      });
+    } else {
+      missing.push(
+        "Wind data was unavailable"
+      );
+    }
+
+    if (averagePressure !== null) {
+      findings.push({
+        label: "Surface pressure",
+        value: `${averagePressure.toFixed(0)} hPa`,
+        tone: "neutral",}
+      );
+    } else {
+      missing.push(
+        "Surface pressure data was unavailable"
+      );
+    }
+
+    /**
+     * The module cannot determine from weather alone
+     * whether the claimed event actually happened.
+     */
+    missing.push(
+      "Weather data cannot independently confirm that the claimed event occurred"
+    );
+
+    warnings.push(
+      "Historical weather data represents modeled/reanalysis conditions and may differ from conditions at the exact capture point."
+    );
+
+    const summary =
+      conditions.length > 0
+        ? `Historical weather for ${coordinates.resolvedLocation} on ${claim.date} shows ${conditions.join(
+            ", "
+          ).toLowerCase()}, with approximately ${totalPrecipitation.toFixed(
+            1
+          )} mm of precipitation. These conditions can be used as supporting evidence for the claim, but weather alone cannot establish that the event occurred.`
+        : `Historical weather data was retrieved for ${coordinates.resolvedLocation} on ${claim.date}. The available weather evidence can be used as supporting context, but it cannot independently establish that the claimed event occurred.`;
+
+    return {
+      score: Math.min(score, 25),
+      maxScore: 25,
+      summary,
+      findings,
+      missing,
+      warnings,
+      data: {
+        provider: "Open-Meteo",
+        location: coordinates.resolvedLocation,
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude,
+        date: claim.date,
+        timezone: weather.timezone ?? null,
+        conditions,
+        averageTemperature,
+        averageHumidity,
+        totalPrecipitation,
+        totalRain,
+        maximumWind,
+        averagePressure,
+      },
+    };
+  } catch (error) {
+    console.error("Weather module error:", error);
+
+    return {
+      score: 0,
+      maxScore: 25,
+      summary:
+        "Weather verification could not be completed because the historical weather service was unavailable.",
+      findings: [
+        {
+          label: "Weather verification",
+          value: "Unable to retrieve historical data",
+          tone: "warn",
+        },
+      ],
+      missing: [
+        "Historical weather data for the claimed location/date",
+      ],
+      warnings: [
+        "Weather verification failed and should not be interpreted as evidence against the claim.",
+      ],
+      data: {
+        provider: "Open-Meteo",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unknown weather error",
+      },
+    };
+  }
+}
+
+export default analyzeWeather;
+
+==================== C:\Users\VARSHA\Desktop\Tech Souls\VisStya-AI-3.O\VISSTYA-AI-NEW\server\routes\verify.ts ====================
+import { Router } from "express";
+
+import type {
+  ClaimInput,
+  MediaInput,
+  VerificationRequest,
+} from "../types.js";
+
+import { analyzeMetadata } from "../modules/metadata.js";
+import { analyzeVision } from "../modules/vision.js";
+import analyzeWeather from "../modules/weather.js";
+import analyzeEvidence from "../modules/evidence.js";
+
+import { calculateScore } from "../scoring.js";
+import { buildDisplayResult } from "../display.js";
+
+const router = Router();
+
+/**
+ * POST /api/verify
+ *
+ * Main verification pipeline.
+ *
+ * Flow:
+ *
+ * Request
+ *   ↓
+ * Metadata
+ *   ↓
+ * Vision
+ *   ↓
+ * Weather
+ *   ↓
+ * Evidence
+ *   ↓
+ * Scoring
+ *   ↓
+ * Display
+ *   ↓
+ * Final report
+ */
+router.post("/", async (req, res) => {
+  try {
+    const { media, claim } =
+      req.body as Partial<VerificationRequest>;
+
+    /**
+     * 1. Validate media
+     */
+    if (!media) {
+      return res.status(400).json({
+        ok: false,
+        error: "Media is required",
+      });
+    }
+
+    /**
+     * 2. Validate claim
+     */
+    if (!claim) {
+      return res.status(400).json({
+        ok: false,
+        error: "Claim information is required",
+      });
+    }
+
+    /**
+     * 3. Validate event
+     */
+    if (
+      !claim.event ||
+      typeof claim.event !== "string"
+    ) {
+      return res.status(400).json({
+        ok: false,
+        error: "Claim event is required",
+      });
+    }
+
+    /**
+     * Convert validated request into the types
+     * expected by the verification modules.
+     */
+    const mediaInput = media as MediaInput;
+    const claimInput = claim as ClaimInput;
+
+    /**
+     * 4. Run all four modules.
+     *
+     * They are independent, so they can run
+     * concurrently.
+     */
+    const [
+      metadata,
+      vision,
+      weather,
+      evidence,
+    ] = await Promise.all([
+      analyzeMetadata(mediaInput, claimInput),
+      analyzeVision(mediaInput, claimInput),
+      analyzeWeather(claimInput),
+      analyzeEvidence(claimInput),
+    ]);
+
+    /**
+     * 5. Collect module results.
+     */
+    const modules = {
+      metadata,
+      vision,
+      weather,
+      evidence,
+    };
+
+    /**
+     * 6. Calculate the overall score.
+     *
+     * scoring.ts only combines module results.
+     */
+    const scoring = calculateScore(modules);
+
+    /**
+     * 7. Build the final human-readable report.
+     *
+     * display.ts creates the content-centric summary
+     * and preserves the individual module information.
+     */
+    const report = buildDisplayResult(
+      claimInput,
+      modules,
+      scoring
+    );
+
+    /**
+     * 8. Send the final report to the frontend.
+     */
+    return res.status(200).json({
+      ok: true,
+      report,
+    });
+  } catch (error) {
+    console.error(
+      "Verification pipeline error:",
+      error
+    );
+
+    return res.status(500).json({
+      ok: false,
+      error: "Verification pipeline failed",
+    });
+  }
+});
+
+export default router;
+
+
+==================== git status ====================
+ M package-lock.json
+ M package.json
+?? server/
