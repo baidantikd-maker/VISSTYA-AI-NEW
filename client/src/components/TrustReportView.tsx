@@ -220,8 +220,8 @@ export function TrustReportView({
         <p className="section-label dark:font-extrabold dark:text-[hsl(261_88%_60%)]">Caveats</p>
         <h2 className="mt-2 text-xl text-[hsl(var(--foreground))] md:text-2xl dark:text-white dark:[text-shadow:0_0_2px_hsl(270_90%_65%/0.6),0_0_10px_hsl(270_90%_65%/0.35),0_0_20px_hsl(270_90%_65%/0.15)]">Important limitations</h2>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
-          {report.limitations.map((lim) => (
-            <div key={lim.title} className="card-glow rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4 dark:border-white/60 dark:bg-transparent dark:shadow-[0_0_6px_rgba(255,255,255,0.18),0_0_14px_rgba(255,255,255,0.08)]">
+          {report.limitations.map((lim, index) => (
+            <div key={index} className="card-glow rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4 dark:border-white/60 dark:bg-transparent dark:shadow-[0_0_6px_rgba(255,255,255,0.18),0_0_14px_rgba(255,255,255,0.08)]">
               <p className="flex items-center gap-2 text-sm font-medium text-[hsl(var(--foreground))]">
                 <ShieldAlert className="size-4 text-average" />
                 {lim.title}

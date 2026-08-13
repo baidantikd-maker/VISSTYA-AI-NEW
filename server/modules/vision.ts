@@ -1,4 +1,12 @@
 import { env } from "../env.js";
+
+
+const GEMINI_MODEL = "gemini-3.6-flash";
+
+interface ImageData {
+  mimeType: string;
+  base64: string;
+}
 import type {
   ClaimInput,
   MediaInput,
@@ -27,6 +35,127 @@ interface VisionObservation {
 }
 
 /**
+ * Extract base64 image bytes + MIME type from a MediaInput.
+ *
+ * Supports data: URLs (base64 already embedded — what the client
+ * currently sends) and http(s) URLs (fetched and encoded server-side).
+ * Returns null for anything else (e.g. a browser-local blob: URL,
+ * which the server cannot read).
+ */
+async function getImageData(media: MediaInput): Promise<ImageData | null> {
+  if (!media.url) return null;
+
+  if (media.url.startsWith("data:")) {
+    const match = media.url.match(/^data:([^;,]+)(?:;[^,]*)?,(.*)$/s);
+    if (!match) return null;
+    return { mimeType: match[1], base64: match[2] };
+  }
+
+  if (/^https?:\/\//i.test(media.url)) {
+    try {
+      const response = await fetch(media.url);
+      if (!response.ok) return null;
+      const arrayBuffer = await response.arrayBuffer();
+      const base64 = Buffer.from(arrayBuffer).toString("base64");
+      const mimeType =
+        response.headers.get("content-type") ?? media.mimeType ?? "image/jpeg";
+      return { mimeType, base64 };
+    } catch {
+      return null;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Call Gemini to analyze the image against the claim.
+ * Returns null on any failure — never throws out of this function.
+ */
+async function callGeminiVision(
+  imageData: ImageData,
+  claim: ClaimInput
+): Promise<VisionObservation | null> {
+  const prompt = `You are analyzing an image for a misinformation-verification system.
+
+Claim being made about this image: "${claim.event}"
+Claimed location: ${claim.location ?? "not specified"}
+Claimed date: ${claim.date ?? "not specified"}
+
+Analyze the image and respond with ONLY a JSON object (no other text) with these exact fields:
+- sceneDescription: string — one or two sentences describing what is visible
+- claimConsistency: "consistent" | "inconsistent" | "uncertain" — whether the image plausibly matches the claim
+- manipulationIndicators: string[] — specific signs of digital editing/manipulation; empty array if none found
+- generationIndicators: string[] — specific signs the image may be AI-generated; empty array if none found
+- visualCues: string[] — other visual details relevant to verification
+- confidence: number — your confidence in this assessment, between 0 and 1`;
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": env.visionProviderKey ?? "",
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              { text: prompt },
+              {
+                inline_data: {
+                  mime_type: imageData.mimeType,
+                  data: imageData.base64,
+                },
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          responseMimeType: "application/json",
+        },
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    console.error(`Gemini vision request failed with status ${response.status}`);
+    return null;
+  }
+
+  const data = (await response.json()) as {
+    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+  };
+
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) return null;
+
+  try {
+    const parsed = JSON.parse(text) as Partial<VisionObservation>;
+
+    if (
+      typeof parsed.sceneDescription !== "string" ||
+      !["consistent", "inconsistent", "uncertain"].includes(
+        parsed.claimConsistency as string
+      ) ||
+      !Array.isArray(parsed.manipulationIndicators) ||
+      !Array.isArray(parsed.generationIndicators) ||
+      !Array.isArray(parsed.visualCues) ||
+      typeof parsed.confidence !== "number"
+    ) {
+      console.error("Gemini vision response did not match expected shape");
+      return null;
+    }
+
+    return parsed as VisionObservation;
+  } catch (error) {
+    console.error("Failed to parse Gemini vision response:", error);
+    return null;
+  }
+}
+
+/**
  * Gemini/provider boundary.
  *
  * We keep the actual AI provider isolated here.
@@ -42,23 +171,19 @@ async function analyzeWithVisionProvider(
   claim: ClaimInput
 ): Promise<VisionObservation | null> {
   if (!env.visionProviderKey) {
-    // No key configured — stay in stub mode, don't throw.
     return null;
   }
 
   try {
-    // real provider call goes here once you have the key
-    // const result = await callVisionAPI(env.visionProviderKey, media, claim);
-    // return result;
-    return null;
+    const imageData = await getImageData(media);
+    if (!imageData) return null;
+
+    return await callGeminiVision(imageData, claim);
   } catch (error) {
     console.error("Vision provider call failed:", error);
-    // Swallow the error — degrade to stub mode, never let a
-    // provider outage crash /api/verify.
     return null;
   }
 }
-
 /**
  * Main vision analysis function.
  */

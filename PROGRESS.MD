@@ -27,6 +27,16 @@ Response: { ok, report }
 Stack: React 19 + Vite 7 + TypeScript (client) · Express 5 + tsx (server)
 · Tailwind 4 + Radix UI (client) · Open-Meteo (weather module, live)
 
+**Frontend note:** the client (`client/src/`) was originally built as a
+100%-standalone app with a fake `mock/engine.ts` (`generateReport()`)
+producing randomized reports, persisted via `mock/store.ts`
+(`mockStore`, localStorage-backed, share tokens, subscribe/emit
+pattern). We are **keeping `mockStore` as the real local report store**
+— it's solid infra — and only replacing what feeds it: `generateReport()`
+is swapped for a real backend call + adapter. Pages (`Verify.tsx`,
+History/Dashboard via `useMockReports.ts`) don't need to change since
+they only ever talked to `mockStore`, not to `engine.ts` directly.
+
 ---
 
 ## Done
@@ -72,38 +82,104 @@ Stack: React 19 + Vite 7 + TypeScript (client) · Express 5 + tsx (server)
       `analyzeWithVisionProvider()` — safe to wire real keys into
       later without touching error-handling logic again
 - [x] `.env.example` added at repo root
+- [x] **Frontend ↔ backend wiring (code written, not yet tested end-to-end):**
+      - `client/src/lib/api.ts` — `verifyClaim()`, calls
+        `${VITE_API_BASE_URL}/api/verify`, typed to match
+        `DisplayResult` exactly
+      - `client/src/lib/reportAdapter.ts` — `adaptVerifyResponse()`,
+        converts backend `DisplayResult` → client's
+        `VerificationReport` shape (band→status mapping,
+        module findings→items, evidence sources→Source[], real
+        limitations→Limitation[] with generic titles since backend
+        only gives flat strings)
+      - `client/src/pages/Processing.tsx` — rewritten: kicks off
+        `verifyClaim()` immediately on mount (parallel to the visual
+        step animation, not sequential), navigates to the report once
+        both the animation and the real fetch are done, added an
+        error state for network/backend failures (the mock version
+        could never fail, so this is new)
+      - `mockStore`, `Verify.tsx`, `useMockReports.ts` — untouched,
+        no changes needed
+
+- [x] **End-to-end test passed:** real upload → `POST /api/verify` (200) →
+      real metadata/weather results, honest stub results for
+      vision/evidence → adapted report rendered in the UI. First
+      confirmed real (non-mock) verification.
+      - Weather: live Open-Meteo result rendered correctly
+      - Metadata: real values shown (actual MIME type of uploaded
+        file, honest "EXIF not yet extracted")
+      - Vision/Evidence: correctly showed "unscored" stub state,
+        no fake data
+      - Console noise investigated: `favicon.ico 404` (harmless,
+        no favicon file yet); duplicate `/api/verify` calls
+        (React 19 Strict Mode double-mounts components in dev only —
+        not a production issue, not worth fixing now)
+- [x] **Bug fix:** duplicate React key warning in the limitations list
+      (`.map((lim) => <div key={lim.title}>`) — every real-backend
+      limitation shared the same title, so keys collided. Fixed on
+      the render side: `.map((lim, index) => <div key={index}>`,
+      since the list is static and never reorders.
+- [x] **Bug fix:** `PayloadTooLargeError` (413) on image upload —
+      Express's default JSON body limit is 100kb, too small for a
+      base64-encoded image. Fixed with
+      `express.json({ limit: "25mb" })` in `server/index.ts`.
+- [x] **Bug fix:** weather module resolved "Assam" (an Indian state)
+      to an unrelated place in Mozambique due to Open-Meteo's fuzzy
+      geocoding blindly trusting its first result. Fixed by scoring
+      geocoding candidates (exact/prefix name match + population) and
+      picking the best one, plus surfacing the actually-resolved
+      location as its own "Location matched" finding (tone: `warn`
+      + explicit caveat when confidence is low) so a bad match is
+      visible in the report rather than silently baked into the
+      score. **Known limitation:** ambiguous/large-region names still
+      benefit from specifying "city, state, country" in the claim —
+      confirmed working correctly with that pattern.
+- [x] **Weather module: confirmed solid.** Live, tested, geocoding
+      hardened. Considered done for now.
 
 ---
 
 ## Next up
 
-- [ ] **Client API base URL** — add `VITE_API_BASE_URL` env var,
-      point frontend fetch calls at it instead of a relative
-      `/api/verify` path (needed once frontend/backend are on
-      different domains — Vercel + Render)
+- [ ] **Vision provider — Gemini (decided):** get API key from
+      https://aistudio.google.com/apikey, add as `VISION_API_KEY` in
+      `.env`, then wire the real call inside
+      `analyzeWithVisionProvider()` in `vision.ts`
+- [ ] **Evidence provider — Tavily (decided):** get API key from
+      https://tavily.com dashboard, add as `EVIDENCE_API_KEY` in
+      `.env`, then wire the real call inside
+      `fetchEvidenceSources()` in `evidence.ts`. Chosen over Google
+      Custom Search (needs a separate CSE ID, 100/day free) and
+      Serper.dev (no real free tier) — Tavily's response shape
+      (title/url/snippet/publishedAt) maps almost directly onto the
+      existing `EvidenceSource` interface.
+- [ ] **Future work (not now): reverse image search.** Clarified
+      during planning — the evidence module cross-checks the
+      *claimed event* via text search (Tavily); it does NOT check
+      whether the *uploaded image itself* has appeared online before
+      (e.g. old/unrelated-event photo being recirculated as new).
+      That needs a genuinely different capability — Google Cloud
+      Vision's Web Detection or TinEye's API — and would likely
+      become its own module or extend `vision.ts`. Deliberately
+      deferred to avoid scope creep while wiring the first two
+      providers.
 - [ ] **Deploy backend to Render** — connect repo, build command
       `npm install`, start command `npm run server`, set
       `ALLOWED_ORIGIN` to the exact Vercel production domain
       (exact match required — `credentials: true` breaks with wildcards)
-- [ ] **Vision provider** — connect a real vision model (e.g. Gemini)
-      inside the now-scaffolded `analyzeWithVisionProvider()` in
-      `vision.ts`
-- [ ] **Evidence provider** — connect a real search/evidence API
-      inside the now-scaffolded `fetchEvidenceSources()` in
-      `evidence.ts`
+- [ ] **Set `VITE_API_BASE_URL`** in Vercel's production env vars once
+      the Render service URL is known
 - [ ] **Auth/persistence direction** — `skills-lock.json` has Supabase
       skills installed; decide whether Supabase (Postgres + real
       server-verified auth) is the actual plan before building
       anything custom — currently unresolved
 - [ ] **Rate limiting** on `/api/verify` — needed before provider
       calls cost real money per request
-- [ ] **Frontend ↔ backend integration** — wire the client UI to
-      `POST /api/verify` and render `DisplayResult` (verdict,
-      summary, keyFindings, per-module findings, limitations)
 - [ ] **EXIF extraction** — `metadata.ts` currently reports EXIF as
       "not yet extracted"; add a real EXIF parser for uploaded images
 - [ ] Basic tests for `scoring.ts` (pure function, easy to unit test
       first) before adding provider complexity
+- [ ] (low priority) add a real favicon to `client/public/`
 
 ---
 
@@ -116,3 +192,11 @@ Stack: React 19 + Vite 7 + TypeScript (client) · Express 5 + tsx (server)
   fabricate a result.
 - Server and client now have separate tsconfigs on purpose — don't
   merge them back, since they need different module resolution modes.
+- **Dev workflow:** `npm run server` and `npm run dev` must run in
+  **two separate terminals simultaneously** — both are long-running
+  foreground processes. Running them one after another in the same
+  terminal stops the first one. On Windows, `tsx` processes can
+  sometimes survive `Ctrl+C`; if `ERR_CONNECTION_REFUSED` or a stale
+  413 shows up after a restart, check
+  `Get-NetTCPConnection -LocalPort 5000` for a leftover process before
+  assuming it's a code bug.

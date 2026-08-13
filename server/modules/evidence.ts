@@ -1,4 +1,105 @@
 import { env } from "../env.js";
+
+const GEMINI_MODEL = "gemini-3.6-flash";
+
+type Stance = "supporting" | "contradicting" | "inconclusive";
+
+/**
+ * Classify each source's stance toward the claim using Gemini.
+ * Falls back to "inconclusive" for every source on any failure —
+ * never throws, never invents a stance it can't justify.
+ */
+async function classifyStances(
+  claim: ClaimInput,
+  sources: Array<{ title: string; snippet?: string }>
+): Promise<Stance[]> {
+  const fallback: Stance[] = sources.map(() => "inconclusive");
+
+  if (!env.visionProviderKey || sources.length === 0) {
+    return fallback;
+  }
+
+  const sourceList = sources
+    .map(
+      (s, i) =>
+        `[${i}] Title: ${s.title}\nSnippet: ${s.snippet ?? "(no snippet)"}`
+    )
+    .join("\n\n");
+
+  const prompt = `You are a fact-checking assistant. A claim is being verified: "${claim.event}"${claim.location ? ` (location: ${claim.location})` : ""}${claim.date ? ` (date: ${claim.date})` : ""}.
+
+Below are ${sources.length} search results found while researching this claim. For EACH one, classify whether it SUPPORTS the claim, CONTRADICTS the claim, or is INCONCLUSIVE (off-topic, too vague, or about a different event).
+
+${sourceList}
+
+Respond with ONLY a JSON array of ${sources.length} strings, in order, each one of exactly: "supporting", "contradicting", "inconclusive".`;
+
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": env.visionProviderKey,
+        },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType: "application/json" },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      console.error(
+        `Stance classification request failed with status ${response.status}`
+      );
+      return fallback;
+    }
+
+    const data = (await response.json()) as {
+      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+    };
+
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) return fallback;
+
+    const parsed = JSON.parse(text) as unknown;
+
+    if (
+      !Array.isArray(parsed) ||
+      parsed.length !== sources.length ||
+      !parsed.every((v) =>
+        ["supporting", "contradicting", "inconclusive"].includes(v as string)
+      )
+    ) {
+      console.error("Stance classification response did not match expected shape");
+      return fallback;
+    }
+
+    return parsed as Stance[];
+  } catch (error) {
+    console.error("Stance classification failed:", error);
+    return fallback;
+  }
+}
+
+interface TavilyResult {
+  title: string;
+  url: string;
+  content: string;
+  score: number;
+  published_date?: string;
+}
+
+function domainFromUrl(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "unknown source";
+  }
+}
+
 import type {
   ClaimInput,
   ModuleFinding,
@@ -55,18 +156,66 @@ function buildEvidenceQuery(claim: ClaimInput): string {
  * Missing key or a provider failure both degrade to an
  * empty source list — never throw out of this function.
  */
+/**
+ * Fetch evidence sources from Tavily.
+ *
+ * HONESTY NOTE: Tavily returns relevant results, not a stance
+ * classification. Every source is tagged "inconclusive" until real
+ * supporting/contradicting classification is built — we don't
+ * fabricate a verdict we haven't actually determined.
+ */
 async function fetchEvidenceSources(
-  _query: string
+  query: string,
+  claim: ClaimInput
 ): Promise<EvidenceSource[]> {
   if (!env.evidenceProviderKey) {
     return [];
   }
 
   try {
-    // real provider call goes here once you have the key
-    // const results = await callEvidenceAPI(env.evidenceProviderKey, query);
-    // return results;
-    return [];
+    const response = await fetch("https://api.tavily.com/search", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${env.evidenceProviderKey}`,
+      },
+      body: JSON.stringify({
+        query,
+        search_depth: "basic",
+        topic: "news",
+        max_results: 6,
+        include_answer: false,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error(`Tavily request failed with status ${response.status}`);
+      return [];
+    }
+
+    const data = (await response.json()) as { results?: TavilyResult[] };
+    const results = data.results ?? [];
+
+    if (results.length === 0) {
+      return [];
+    }
+
+    const draftSources: Omit<EvidenceSource, "relation">[] = results.map(
+      (r) => ({
+        title: r.title,
+        url: r.url,
+        publisher: domainFromUrl(r.url),
+        publishedAt: r.published_date,
+        snippet: r.content,
+      })
+    );
+
+    const stances = await classifyStances(claim, draftSources);
+
+    return draftSources.map((s, i) => ({
+      ...s,
+      relation: stances[i] ?? "inconclusive",
+    }));
   } catch (error) {
     console.error("Evidence provider call failed:", error);
     return [];
@@ -106,7 +255,7 @@ export async function analyzeEvidence(
    * We are NOT putting fake sources here.
    */
 
-  const sources: EvidenceSource[] = await fetchEvidenceSources(query);
+  const sources: EvidenceSource[] = await fetchEvidenceSources(query, claim);
 
   /**
    * No real evidence provider has been connected yet.

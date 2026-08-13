@@ -4,13 +4,13 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-  "dev": "vite",
-  "server": "tsx server/index.ts",
-  "build": "vite build",
-  "preview": "vite preview",
-  "check": "tsc --noEmit",
-  "format": "prettier --write ."
-},
+    "dev": "vite",
+    "server": "tsx server/index.ts",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "tsc --noEmit",
+    "format": "prettier --write ."
+  },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
@@ -44,6 +44,7 @@
     "cmdk": "^1.1.1",
     "cors": "^2.8.6",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.4.2",
     "embla-carousel-react": "^8.6.0",
     "exifreader": "^4.42.0",
     "express": "^5.2.1",

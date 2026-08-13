@@ -4,6 +4,7 @@ import type {
   ModuleResult,
 } from "../types.js";
 
+
 const OPEN_METEO_URL = "https://archive-api.open-meteo.com/v1/archive";
 
 interface OpenMeteoResponse {
@@ -26,6 +27,7 @@ interface Coordinates {
   latitude: number;
   longitude: number;
   resolvedLocation: string;
+  lowConfidence: boolean;
 }
 
 /**
@@ -43,7 +45,7 @@ async function geocodeLocation(
   );
 
   url.searchParams.set("name", location);
-  url.searchParams.set("count", "1");
+  url.searchParams.set("count", "10");
   url.searchParams.set("language", "en");
   url.searchParams.set("format", "json");
 
@@ -62,30 +64,66 @@ async function geocodeLocation(
       name: string;
       country?: string;
       admin1?: string;
+      population?: number;
     }>;
   };
 
-  const result = data.results?.[0];
+  const results = data.results ?? [];
 
-  if (!result) {
+  if (results.length === 0) {
     throw new Error(`Could not locate "${location}"`);
   }
 
+  /**
+   * Open-Meteo's geocoding search is fuzzy and can return a poor
+   * first match for region/state-level names (e.g. "Assam"
+   * incorrectly resolving to an unrelated small locality
+   * elsewhere). Prefer results whose name closely matches the
+   * query; break ties using population, since larger, better-known
+   * places are more likely to be what the user meant.
+   */
+  const normalizedQuery = location.trim().toLowerCase();
+
+  const scored = results.map((r) => {
+    const normalizedName = r.name.trim().toLowerCase();
+    const exactMatch = normalizedName === normalizedQuery;
+    const prefixMatch = normalizedName.startsWith(
+      normalizedQuery.slice(0, 4)
+    );
+
+    return {
+      result: r,
+      score:
+        (exactMatch ? 1000 : 0) +
+        (prefixMatch ? 100 : 0) +
+        (r.population ?? 0) / 1_000_000,
+    };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+
+  const best = scored[0].result;
+
+  const bestNormalizedName = best.name.trim().toLowerCase();
+  const lowConfidence =
+    bestNormalizedName !== normalizedQuery &&
+    !bestNormalizedName.startsWith(normalizedQuery.slice(0, 4));
+
   const resolvedLocation = [
-    result.name,
-    result.admin1,
-    result.country,
+    best.name,
+    best.admin1,
+    best.country,
   ]
     .filter(Boolean)
     .join(", ");
 
   return {
-    latitude: result.latitude,
-    longitude: result.longitude,
+    latitude: best.latitude,
+    longitude: best.longitude,
     resolvedLocation,
+    lowConfidence,
   };
 }
-
 /**
  * Convert Open-Meteo weather codes into human-readable
  * descriptions.
@@ -281,6 +319,17 @@ export async function analyzeWeather(
 
   try {
     const coordinates = await geocodeLocation(claim.location);
+    findings.push({
+  label: "Location matched",
+  value: coordinates.resolvedLocation,
+  tone: coordinates.lowConfidence ? "warn" : "good",
+});
+
+if (coordinates.lowConfidence) {
+  warnings.push(
+    `The location "${claim.location}" could not be matched with high confidence; weather was checked for "${coordinates.resolvedLocation}", which may not be the intended location.`
+  );
+}
 
     const weather = await fetchHistoricalWeather(
       coordinates,

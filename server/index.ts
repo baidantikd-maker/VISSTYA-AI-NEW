@@ -1,3 +1,4 @@
+import "dotenv/config";
 import verifyRouter from "./routes/verify.js";
 import express from "express";
 import cors from "cors";
@@ -16,7 +17,7 @@ app.use(
   })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "25mb" }));
 
 /**
  * Health check

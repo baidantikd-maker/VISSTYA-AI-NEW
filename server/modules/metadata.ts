@@ -1,9 +1,65 @@
+import ExifReader from "exifreader";
 import type {
   ClaimInput,
   MediaInput,
   ModuleResult,
 } from "../types.js";
 
+/**
+ * Extract EXIF tags from a data: URL image.
+ * Returns null if there's no data to read, or extraction fails —
+ * never throws.
+ */
+async function extractExif(
+  media: MediaInput
+): Promise<Record<string, string> | null> {
+  if (!media.url || !media.url.startsWith("data:")) {
+    return null;
+  }
+
+  const match = media.url.match(/^data:([^;,]+)(?:;[^,]*)?,(.*)$/s);
+  if (!match) return null;
+
+  try {
+    const buffer = Buffer.from(match[2], "base64");
+    const tags = ExifReader.load(buffer);
+
+    const relevant: Record<string, string> = {};
+
+    if (tags.DateTimeOriginal?.description) {
+      relevant["Capture date"] = tags.DateTimeOriginal.description;
+    }
+    if (tags.Make?.description || tags.Model?.description) {
+      relevant["Camera"] = [tags.Make?.description, tags.Model?.description]
+        .filter(Boolean)
+        .join(" ");
+    }
+    if (tags.GPSLatitude?.description && tags.GPSLongitude?.description) {
+      relevant["GPS coordinates"] =
+        `${tags.GPSLatitude.description}, ${tags.GPSLongitude.description}`;
+    }
+    if (tags.Software?.description) {
+      relevant["Editing software"] = tags.Software.description;
+    }
+
+    return Object.keys(relevant).length > 0 ? relevant : null;
+  } catch (error) {
+    console.error("EXIF extraction failed:", error);
+    return null;
+  }
+}
+
+function parseExifDate(value: string): Date | null {
+  const match = value.match(
+    /^(\d{4}):(\d{2}):(\d{2})[ T](\d{2}):(\d{2}):(\d{2})/
+  );
+  if (match) {
+    const [, y, mo, d, h, mi, s] = match;
+    return new Date(`${y}-${mo}-${d}T${h}:${mi}:${s}`);
+  }
+  const fallback = new Date(value);
+  return isNaN(fallback.getTime()) ? null : fallback;
+}
 /**
  * Metadata verification module.
  *
@@ -25,6 +81,7 @@ interface MetadataData {
   mimeType?: string;
   metadataAvailable: boolean;
   metadataFields: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 function getUrlType(
@@ -78,7 +135,7 @@ function inspectDataUrl(url: string): {
  */
 export async function analyzeMetadata(
   media: MediaInput,
-  _claim: ClaimInput
+  claim: ClaimInput
 ): Promise<ModuleResult> {
   const missing: string[] = [];
   const warnings: string[] = [];
@@ -88,6 +145,7 @@ export async function analyzeMetadata(
 
   let metadataAvailable = false;
   let detectedMimeType = media.mimeType;
+  let dateMismatch = false;
 
   /**
    * Basic media information.
@@ -202,22 +260,62 @@ export async function analyzeMetadata(
     });
   }
 
-  /**
-   * EXIF status.
-   *
-   * We are intentionally NOT claiming EXIF has been extracted yet.
-   * That will be added using a proper EXIF parser/ingestion path.
+/**
+   * EXIF extraction — real, via exifreader.
    */
+  const exifData = await extractExif(media);
+
+if (exifData) {
   findings.push({
     label: "EXIF metadata",
-    value: "Not yet extracted",
+    value: Object.entries(exifData)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join(" · "),
+    tone: "good",
+  });
+
+  const captureDateStr = exifData["Capture date"];
+  if (captureDateStr && claim.date) {
+    const captureDate = parseExifDate(captureDateStr);
+    const claimedDate = new Date(claim.date);
+
+    if (captureDate && !isNaN(claimedDate.getTime())) {
+      const diffDays =
+        Math.abs(captureDate.getTime() - claimedDate.getTime()) /
+        (1000 * 60 * 60 * 24);
+
+      if (diffDays > 3) {
+        findings.push({
+          label: "Capture date vs claimed date",
+          value: `Image captured ${captureDateStr}, but claim states ${claim.date} (${Math.round(diffDays)} days apart)`,
+          tone: "bad",
+        });
+
+        warnings.push(
+          `The image's capture date does not match the claimed date, which may indicate the media is being reused from a different event.`
+        );
+
+        dateMismatch = true;
+      } else {
+        findings.push({
+          label: "Capture date vs claimed date",
+          value: "Consistent with claimed date",
+          tone: "good",
+        });
+      }
+    }
+  }
+} else {
+  findings.push({
+    label: "EXIF metadata",
+    value: "None found (stripped, unsupported format, or not a data URL)",
     tone: "warn",
   });
 
   missing.push(
-    "Camera metadata, capture timestamp and GPS coordinates require EXIF extraction from the original image"
+    "Camera metadata, capture timestamp and GPS coordinates were not present or could not be extracted"
   );
-
+}
   /**
    * Re-encoding/provenance.
    *
@@ -268,7 +366,15 @@ export async function analyzeMetadata(
     score += 1;
   }
 
-  score = Math.min(score, 15);
+  if (exifData) {
+    score += 2;
+  }
+
+  if (dateMismatch) {
+    score -= 5;
+  }
+
+  score = Math.max(0, Math.min(score, 15));
 
   /**
    * Determine module-level summary.
