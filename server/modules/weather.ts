@@ -276,46 +276,28 @@ export async function analyzeWeather(
   const warnings: string[] = [];
 
   if (!claim.location) {
-    return {
-      score: 0,
-      maxScore: 25,
-      summary:
-        "Weather verification could not be performed because no location was provided.",
-      findings: [
-        {
-          label: "Location",
-          value: "Not provided",
-          tone: "bad",
-        },
-      ],
-      missing: [
-        "Claim location is required for historical weather verification",
-      ],
-      warnings: [],
-      data: {},
-    };
-  }
+  return {
+    score: 0,
+    maxScore: 0,
+    summary: "Weather verification was skipped because no location was provided — not counted against the trust score.",
+    findings: [{ label: "Location", value: "Not provided (weather check skipped)", tone: "neutral" }],
+    missing: ["Claim location was not provided, so historical weather could not be cross-checked"],
+    warnings: [],
+    data: {},
+  };
+}
 
-  if (!claim.date) {
-    return {
-      score: 0,
-      maxScore: 25,
-      summary:
-        "Weather verification could not be performed because no date was provided.",
-      findings: [
-        {
-          label: "Claim date",
-          value: "Not provided",
-          tone: "bad",
-        },
-      ],
-      missing: [
-        "Claim date is required for historical weather verification",
-      ],
-      warnings: [],
-      data: {},
-    };
-  }
+if (!claim.date) {
+  return {
+    score: 0,
+    maxScore: 0,
+    summary: "Weather verification was skipped because no date was provided — not counted against the trust score.",
+    findings: [{ label: "Claim date", value: "Not provided (weather check skipped)", tone: "neutral" }],
+    missing: ["Claim date was not provided, so historical weather could not be cross-checked"],
+    warnings: [],
+    data: {},
+  };
+}
 
   try {
     const coordinates = await geocodeLocation(claim.location);

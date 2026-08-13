@@ -223,12 +223,7 @@ async function fetchEvidenceSources(
 }
 
 /**
- * Analyse evidence for a claim.
- *
- * IMPORTANT:
- * The real external evidence API/search provider will be
- * connected inside this function later.
- */
+ * Analyse evidence for a claim. */
 export async function analyzeEvidence(
   claim: ClaimInput
 ): Promise<ModuleResult> {
@@ -239,20 +234,14 @@ export async function analyzeEvidence(
   const missing: string[] = [];
 
   /**
-   * -------------------------------------------------------
-   * REAL EVIDENCE PROVIDER WILL GO HERE
-   * -------------------------------------------------------
-   *
-   * Example future flow:
-   *
-   * const sources = await searchEvidence(query);
-   *
-   * Then classify each source as:
+
+   
+   * Then Classify each source as:
    * - supporting
    * - contradicting
    * - inconclusive
    *
-   * We are NOT putting fake sources here.
+  
    */
 
   const sources: EvidenceSource[] = await fetchEvidenceSources(query, claim);

@@ -2,7 +2,7 @@ import type {
   ModuleResults,
   ScoringResult,
   TrustBand,
-} from "./types";
+} from "./types.js";
 
 /**
  * Maximum score contributed by each verification module.
@@ -80,25 +80,13 @@ export function calculateScore(
    * -------------------------------------------------------
    */
 
-  const metadataScore = clampScore(
-    modules.metadata.score,
-    MODULE_MAX_SCORES.metadata
-  );
+  const metadataScore = clampScore( modules.metadata.score,  modules.metadata.maxScore );
 
-  const visionScore = clampScore(
-    modules.vision.score,
-    MODULE_MAX_SCORES.vision
-  );
+  const visionScore = clampScore( modules.vision.score, modules.vision.maxScore);
 
-  const weatherScore = clampScore(
-    modules.weather.score,
-    MODULE_MAX_SCORES.weather
-  );
+  const weatherScore = clampScore( modules.weather.score, modules.weather.maxScore);
 
-  const evidenceScore = clampScore(
-    modules.evidence.score,
-    MODULE_MAX_SCORES.evidence
-  );
+  const evidenceScore = clampScore( modules.evidence.score, modules.evidence.maxScore);
 
   /**
    * -------------------------------------------------------
@@ -110,17 +98,9 @@ export function calculateScore(
    * 15 + 25 + 25 + 35 = 100
    */
 
-  const totalScore =
-    metadataScore +
-    visionScore +
-    weatherScore +
-    evidenceScore;
+  const totalScore = metadataScore + visionScore + weatherScore + evidenceScore;
 
-  const maxScore =
-    MODULE_MAX_SCORES.metadata +
-    MODULE_MAX_SCORES.vision +
-    MODULE_MAX_SCORES.weather +
-    MODULE_MAX_SCORES.evidence;
+  const maxScore = modules.metadata.maxScore + modules.vision.maxScore + modules.weather.maxScore + modules.evidence.maxScore;
 
   /**
    * -------------------------------------------------------
@@ -129,12 +109,10 @@ export function calculateScore(
    *
    * This is technically redundant because the current
    * maximum is 100, but keeping it makes the engine safer
-   * if the weights change later.
+   * if the weights change .
    */
 
-  const percentage = Math.round(
-    (totalScore / maxScore) * 100
-  );
+  const percentage = maxScore > 0 ? Math.round((totalScore / maxScore) * 100) : 0;
 
   /**
    * -------------------------------------------------------
