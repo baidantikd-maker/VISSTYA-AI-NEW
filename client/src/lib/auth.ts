@@ -16,23 +16,33 @@ export const GUEST_USER: AuthUser = {
 
 const listeners = new Set<() => void>();
 
+// Cached snapshot so useSyncExternalStore always receives a stable reference
+// between writes. Returning a freshly parsed object every call makes React
+// re-render forever ("Maximum update depth exceeded", error #185).
+let cachedUser: AuthUser | null = null;
+let cacheReady = false;
+
 function emit() {
   listeners.forEach((listener) => listener());
 }
 
 function readUser(): AuthUser | null {
+  if (cacheReady) return cachedUser;
+  cacheReady = true;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
+    if (!raw) return (cachedUser = null);
     const parsed = JSON.parse(raw) as AuthUser;
-    if (!parsed?.id || !parsed?.email) return null;
-    return parsed;
+    cachedUser = parsed?.id && parsed?.email ? parsed : null;
   } catch {
-    return null;
+    cachedUser = null;
   }
+  return cachedUser;
 }
 
 function writeUser(user: AuthUser | null) {
+  cachedUser = user;
+  cacheReady = true;
   try {
     if (user) localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
     else localStorage.removeItem(STORAGE_KEY);
