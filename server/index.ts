@@ -1,4 +1,13 @@
 import "dotenv/config";
+
+import { setGlobalDispatcher, Agent } from "undici";
+
+setGlobalDispatcher(
+  new Agent({
+    connect: { family: 4 },
+  })
+);
+
 import verifyRouter from "./routes/verify.js";
 import express from "express";
 import cors from "cors";
