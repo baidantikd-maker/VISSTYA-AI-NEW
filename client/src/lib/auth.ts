@@ -42,13 +42,6 @@ function writeUser(user: AuthUser | null) {
   emit();
 }
 
-function displayName(email: string, name?: string): string {
-  const trimmed = name?.trim();
-  if (trimmed) return trimmed;
-  const local = email.split("@")[0]?.trim();
-  return local ? local.charAt(0).toUpperCase() + local.slice(1) : "User";
-}
-
 export const authStore = {
   subscribe(listener: () => void): () => void {
     listeners.add(listener);
@@ -62,28 +55,6 @@ export const authStore = {
   isGuest(): boolean {
     const current = readUser();
     return current === null || current.isGuest === true;
-  },
-
-  signIn(email: string, password: string, name?: string): AuthUser {
-    const normalizedEmail = email.trim().toLowerCase();
-    if (!normalizedEmail.includes("@")) {
-      throw new Error("Enter a valid email address.");
-    }
-    if (password.length < 6) {
-      throw new Error("Password must be at least 6 characters.");
-    }
-
-    const user: AuthUser = {
-      id: normalizedEmail,
-      email: normalizedEmail,
-      name: displayName(normalizedEmail, name),
-    };
-    writeUser(user);
-    return user;
-  },
-
-  signOut() {
-    writeUser(null);
   },
 
   updateProfile(patch: Partial<Pick<AuthUser, "name" | "email">>) {

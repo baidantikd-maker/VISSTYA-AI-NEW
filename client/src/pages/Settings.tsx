@@ -59,7 +59,7 @@ function RetentionOption({
 }
 
 export default function Settings() {
-  const { user, isGuest, logout } = useAuth();
+  const { user, isGuest } = useAuth();
   const { theme, toggleTheme, switchable } = useTheme();
   const [name, setName] = useState(user?.name ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
@@ -281,31 +281,6 @@ export default function Settings() {
               content is held only for the duration of analysis unless you opt in
               to a retention period above.
             </p>
-          </Section>
-
-          {/* Account */}
-          <Section
-            title="Account"
-            description={
-              isGuest
-                ? "No account is required — everything works in guest mode."
-                : "Manage your session."
-            }
-          >
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                if (isGuest) {
-                  window.location.href = "/login";
-                } else {
-                  void logout();
-                  window.location.href = "/";
-                }
-              }}
-            >
-              {isGuest ? "Sign in" : "Sign out"}
-            </Button>
           </Section>
         </div>
           </div>

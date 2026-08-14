@@ -16,7 +16,7 @@ const NAV_ITEMS = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [location, setLocation] = useLocation();
-  const { user, isGuest, logout } = useAuth();
+  const { user } = useAuth();
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
@@ -89,29 +89,16 @@ export function AppShell({ children }: { children: ReactNode }) {
                 {initials}
               </span>
               <span className="text-sm text-[hsl(var(--muted))]">
-                {isGuest ? "Guest" : (user?.name ?? "Signed in")}
+                {user?.name ?? "Guest"}
               </span>
             </div>
-            {isGuest ? (
-              <button
-                type="button"
-                onClick={() => setLocation("/login")}
-                className="rounded-md bg-[hsl(var(--primary))] px-3 py-1.5 text-sm font-medium text-[hsl(var(--primary-foreground))] transition-colors hover:opacity-90"
-              >
-                Sign in
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  void logout();
-                  setLocation("/");
-                }}
-                className="rounded-md px-3 py-1.5 text-sm text-[hsl(var(--muted))] transition-colors hover:bg-[hsl(262_70%_85%)] hover:text-[hsl(var(--foreground))] dark:hover:bg-[hsl(var(--secondary))]"
-              >
-                Sign out
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => setLocation("/settings")}
+              className="rounded-md px-3 py-1.5 text-sm text-[hsl(var(--muted))] transition-colors hover:bg-[hsl(262_70%_85%)] hover:text-[hsl(var(--foreground))] dark:hover:bg-[hsl(var(--secondary))]"
+            >
+              Settings
+            </button>
           </div>
         </div>
       </header>
